@@ -1,0 +1,90 @@
+{
+  "navigation": {
+    "dashboard": "ප්‍රධාන පැනලය",
+    "statistics": "සංඛ්‍යාලේඛන",
+    "profile": "පැතිකඩ",
+    "activities": "ක්‍රියාකාරකම්",
+    "settings": "සැකසුම්",
+    "logout": "පිටවීම"
+  },
+  "dashboard": {
+    "welcome": "ආයුබෝවන්",
+    "totalAmount": "මුළු මුදල",
+    "dailyTransactions": "අද ගනුදෙනු",
+    "dailyTotal": "අද මුළු මුදල",
+    "espDevice": "ESP උපාංගය",
+    "connected": "සම්බන්ධිත",
+    "online": "සබැඳි",
+    "offline": "අසබැඳි",
+    "coinDistribution": "කාසි ව්‍යාප්තිය",
+    "recentActivities": "මෑත ක්‍රියාකාරකම්",
+    "coinInventory": "කාසි ගබඩාව",
+    "autoRefresh": "ස්වයංක්‍රීය නවීකරණය",
+    "coinOperations": "කාසි මෙහෙයුම්",
+    "withdrawCoins": "කාසි ගැනීම",
+    "quickActions": "ඉක්මන් ක්‍රියා",
+    "resetSystem": "පද්ධතිය යළි සැකසීම",
+    "enrollFingerprint": "ඇඟිලි සලකුණ ලියාපදිංචි කරන්න",
+    "exportData": "දත්ත අපනයන",
+    "testConnection": "සම්බන්ධතාව පරීක්ෂා කරන්න",
+    "totalWithdrawal": "මුළු ගැනීම"
+  },
+  "coins": {
+    "rs1": "රු. 1 කාසි",
+    "rs2": "රු. 2 කාසි",
+    "rs5": "රු. 5 කාසි",
+    "rs10": "රු. 10 කාසි",
+    "total": "මුළු"
+  },
+  "actions": {
+    "login": "පිවිසීම",
+    "refresh": "නවීකරණය",
+    "close": "වසන්න",
+    "cancel": "අවලංගු කරන්න",
+    "confirm": "තහවුරු කරන්න",
+    "save": "සුරකින්න",
+    "delete": "මකන්න",
+    "edit": "සංස්කරණය",
+    "add": "එකතු කරන්න",
+    "remove": "ඉවත් කරන්න"
+  },
+  "messages": {
+    "loginSuccess": "පිවිසීම සාර්ථකයි",
+    "loginFailed": "පිවිසීම අසාර්ථකයි",
+    "dataUpdated": "දත්ත සාර්ථකව යාවත්කාලීන කරන ලදී",
+    "connectionLost": "සම්බන්ධතාව නැති වුණා",
+    "connectionRestored": "සම්බන්ධතාව ප්‍රතිසාධනය වුණා",
+    "systemReset": "පද්ධතිය සාර්ථකව යළි සැකසෙන ලදී",
+    "fingerprintEnrolled": "ඇඟිලි සලකුණ සාර්ථකව ලියාපදිංචි කරන ලදී",
+    "dataExported": "දත්ත සාර්ථකව අපනයන කරන ලදී",
+    "connectionTested": "සම්බන්ධතා පරීක්ෂණය සාර්ථකයි",
+    "error": "දෝෂයක් ඇති වුණා",
+    "noActivities": "මෑත ක්‍රියාකාරකම් නැත",
+    "confirmReset": "ඔබට සියලුම කාසි ගණන් ශුන්‍ය කිරීමට අවශ්‍යද? මෙම ක්‍රියාව ආපසු හැරවිය නොහැක.",
+    "settingsComingSoon": "සැකසුම් පැනලය ඉදිරියේදී එනවා!",
+    "exportComingSoon": "දත්ත අපනයන විශේෂාංගය ඉදිරියේදී එනවා!"
+  },
+  "themes": {
+    "light": "ආලෝක තේමාව",
+    "dark": "අඳුරු තේමාව",
+    "auto": "ස්වයංක්‍රීය තේමාව"
+  },
+  "notifications": {
+    "smsAlerts": "SMS අනතුරු ඇඟවීම්",
+    "emailAlerts": "ඊමේල් අනතුරු ඇඟවීම්",
+    "pushNotifications": "තල්ලු දැනුම්දීම්",
+    "lowCoinAlert": "අඩු කාසි ගබඩා අනතුරු ඇඟවීම",
+    "systemAlert": "පද්ධති අනතුරු ඇඟවීම",
+    "securityAlert": "ආරක්ෂක අනතුරු ඇඟවීම"
+  },
+  "reports": {
+    "dailyReport": "දිනපතා වාර්තාව",
+    "weeklyReport": "සතිපතා වාර්තාව",
+    "monthlyReport": "මාසික වාර්තාව", 
+    "customReport": "අභිරුචි වාර්තාව",
+    "generateReport": "වාර්තාව උත්පාදනය කරන්න",
+    "downloadPDF": "PDF බාගත කරන්න",
+    "downloadExcel": "Excel බාගත කරන්න",
+    "reportGenerated": "වාර්තාව සාර්ථකව උත්පාදනය කරන ලදී"
+  }
+}

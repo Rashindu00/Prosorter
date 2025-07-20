@@ -1,0 +1,340 @@
+@import url("https://fonts.googleapis.com/css2? family-Poppins:wght@400;600&display=swap");
+* {
+    margin:0;
+    padding:0;
+    border:none;
+    outline:none;
+    box-sizing:border-box;
+    font-family:"Poppins",sans-serif;
+}
+body{
+    display:flex;
+}
+.card-container{
+    display: flex;
+    gap: 1rem;
+}
+.sidebar{
+    position:sticky;
+    top:0;
+    left:0;
+    bottom:0;
+    width:110px;
+    height:100vh;
+    padding:0 1.7rem;
+    color:#fff;
+    overflow:hidden;
+    transition:all 0.5s linear;
+    background:rgba(113,99,186,255);
+
+}
+.sidebar:hover{
+    width:240px;
+    transition:0.5s;
+}
+.logo{
+    height:80px;
+    padding:16px;
+}
+.menu{
+    height:88%;
+    position:relative;
+    list-style: none;
+    padding:0;
+}
+.menu li{
+    padding:1rem;
+    margin:8px 0;
+    border-radius: 8px;
+    transition: all 0.5s ease-in-out;
+}
+.menu li:hover,
+.active {
+
+    background:#e0e0e058;
+
+}
+
+.menu a{
+    color:#fff;
+    font-size: 14px;
+    text-decoration: none;
+    display:flex;
+    align-items: center;
+    gap:1.5rem;
+}
+.menu a span{
+    overflow:hidden;
+}
+.menu a i{
+    font-size: 1.2rem;
+
+}
+.logout{
+    position: absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+}
+
+/* **** main body section **** */
+.main--content{
+    position:relative;
+    background:#ebe9e9;
+    width:100%;
+    padding:1rem;
+}
+.header--wrapper img{
+    width:50px;
+    height:50px;
+    cursor:pointer;
+    border-radius: 50%;
+} 
+.header--wrapper{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 2rem;
+    margin-bottom: 1rem;
+
+}
+.header--title{
+    color:rgba(113,99,186,255);
+}
+.user--info{
+    display:flex;
+    align-items: center;
+    gap:1rem;
+}
+.search--box{
+    background:rgb(237,237,237);
+    border-radius: 15px;
+    color:rgba(113,99,186,255);
+    display: flex;
+    align-items: center;
+    gap:10px;
+    padding:4px 12px;
+}
+.search--box input{
+    background: transparent;
+    padding: 5px;
+}
+.search--box i{
+    font-size: 1.2rem;
+    cursor:pointer;
+    transition: all 0.5s ease-out;
+}
+.search--box i:hover{
+    transform: scale(1.2);
+}
+/* **** card container **** */
+.card--wrapper{
+    display:flex;
+    flex-wrap:wrap;
+    gap:1rem;
+}
+.main--title{
+    color:rgba(113,99,186,255);
+    padding-bottom:10px;
+    font-size:15px;
+}
+.payment--card{
+    background:rgb(229,223,223);
+    border-radius:10px;
+    padding:1.2rem;
+    width:290px;
+    height:150px;
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.5s ease-in-out;
+}
+.payment--card:hover{
+    transform:translateY(-5px);
+}
+.card--header{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.amount{
+    display: flex;
+    flex-direction: column;
+
+}
+.title{
+    font-size: 12px;
+    font-weight: 200;
+}
+.amount--value{
+    font-size: 24px;
+    font-family: "Courier New", Courier, monospace;
+    font-weight: 600;
+}
+.icon{
+    color: #fff;
+    padding: 1rem;
+    height:60px;
+    width:60px;
+    text-align: center;
+    border-radius:50%;
+    font-size: 1.5rem;
+    background: red;
+}
+.login-body{
+    background-image: url('/images/gradient-1.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100vw;
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.login-form-container{
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 2rem;
+    width: fit-content;
+    height: fit-content;
+
+}
+.logo{
+    width: 200px;
+    height: auto;
+    display: flex;
+    align-content: center;
+}
+.hello{
+    font-size: 2.5rem;
+    font-weight: 100;
+    color: purple;
+}
+.welcome{
+    font-size: 2.6rem;
+    font-weight: bolder;
+    color: purple;
+}
+.logo-container{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.form{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    input[type="text"],input[type="password"]{
+        padding: 1rem 1.2rem;
+        background: #cacaca;
+        width: 300px;
+        font-size: 1.05rem;
+    }  
+    input[type="text"]{
+        border-left: 5px solid purple;
+    }  
+    .forgot-section{
+        display: flex;
+        font-size: 0.8rem;
+        align-items: center;
+        justify-content: space-between;
+        color: rgba(0,0,0,0.6);
+        a{
+            text-decoration: none;
+            text-transform: none;
+            font-weight: bold;
+            
+        }
+        .checkBox{
+            display: flex;
+
+        }
+    
+    }
+    input[type="submit"]{
+        padding: 1rem;
+        background: purple;
+        color: white;
+    }
+
+}
+.changeCoin{
+    margin-top: 2rem;
+}
+.reset{
+    width: fit-content;
+    background: rgb(229,223,223);
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    p{
+        font-size: 1.2rem;
+    }
+    .reset-btn{
+        padding: 1rem 2rem;
+        font-size: 1.3rem;
+        color: white;
+        background:rgba(113,99,186,255);
+        border-radius: 0.5rem;
+    }
+}
+.update-section{
+    padding: 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    p{
+        font-size: 1.2rem;
+        font-weight: bolder;
+        margin-bottom: 1rem;
+    }
+}
+.update-count{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    input{
+        padding: 0.5rem 1rem;
+    }
+}
+.coin{
+    background:rgb(229,223,223);
+    padding: 2rem 2rem;
+    border-radius: 0.5rem;
+}
+.submit-btn{
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    color: white;
+    background:rgba(113,99,186,255);
+    border-radius: 0.5rem;
+}
+.last{
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 2rem;
+}
+.form2{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    button{
+        width: fit-content;
+        margin-top: 1rem;
+        cursor: pointer;
+    }
+    justify-content: center;
+    align-items: center;
+}

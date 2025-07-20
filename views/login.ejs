@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/css/enhanced-style.css" />
+    <title>ProSorter</title>
+</head>
+<body class="login-body">
+    <div class="login-form-container">
+        <div class="logo-container">
+            <img src="/images/ProSorter.png" alt="logo" class="logo">
+        </div>
+        <span class="hello">Hello,</span>
+        <span class="welcome">Welcome!</span>
+        <% if (typeof error !== 'undefined') { %>
+            <div class="error"><%= error %></div>
+        <% } %>
+        <form id="form" method="POST" action="/login" class="form">
+            <input type="text" placeholder="Username" name="username">
+            <input type="password" placeholder="Password" name="password">
+            <div class="forgot-section">
+                <div class="checkBox">
+                    <input type="checkbox" name="rememberMe" id="rememberMe"> Remember Me 
+                </div>
+                <a href="#">Forgot Password?</a>
+            </div>
+            <input type="submit" value="Login" name="Login">
+        </form>
+    </div>
+</body>
+</html>

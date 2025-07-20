@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Design</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <link  rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css " />
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo"></div>
+        <ul class="menu">
+            <li class="active">
+                <a href="#" >
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistics</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-star"></i>
+                    <span>Testimonials</span>
+                </a>
+            </li>
+            <li class="logout">
+                <a href="#">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span><a href="/">Logout</a></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="main--content">
+        <div class="header--wrapper">
+            <div class="header--title">
+                <span>Primary</span>
+                <h2>Dashboard</h2>
+            </div>
+            <div class="user--info">
+                <div class="search--box">
+                </div>
+                <img src="../images/ProSorter.png" alt="">
+            </div>
+        </div>
+        <div class="card--container">
+            <h3 class="main--container">Today's Data</h3>
+            <div class="card-container">
+                <div class="card--wrapper">
+                <div class="payment--card">
+                    <div class="card--header">
+                        <div class="ammount">
+                            <span class="title">Total Amount</span>
+                            <span class="amount--value">Rs <%= total %></span>
+                        </div>
+                      
+                    </div>
+                    <span class="card-detail">ProSorter user1</span>
+
+                </div>
+
+            </div>
+
+            <div class="card--wrapper">
+                <div class="payment--card">
+                    <div class="card--header">
+                        <div class="ammount">
+                            <span class="title">Coin Rs.1 Amount</span>
+                            <span class="amount--value">Rs <%= total1 %></span>
+                        </div>
+                        
+                    </div>
+                    <span class="card-detail">ProSorter user1</span>
+                </div>
+
+                 <div class="card--wrapper">
+                <div class="payment--card">
+                    <div class="card--header">
+                        <div class="ammount">
+                            <span class="title">Coin Rs.2 Amount</span>
+                            <span class="amount--value">Rs <%= total2 %></span>
+                        </div>
+                      
+                    </div>
+                    <span class="card-detail">ProSorter user1</span>
+                </div>
+            </div>
+                 <div class="card--wrapper">
+                <div class="payment--card">
+                    <div class="card--header">
+                        <div class="ammount">
+                            <span class="title">Coin Rs.5 Amount</span>
+                            <span class="amount--value">Rs <%= total5 %></span>
+                        </div>
+                     
+                    </div>
+                    <span class="card-detail">ProSorter user1</span>
+                </div>
+            </div>
+                 <div class="card--wrapper">
+                <div class="payment--card">
+                    <div class="card--header">
+                        <div class="ammount">
+                            <span class="title">Coin Rs.10 Amount</span>
+                            <span class="amount--value">Rs <%= total10 %></span>
+                        </div>
+                     
+                    </div>
+                    <span class="card-detail">ProSorter user1</span>
+                </div>
+            </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="changeCoin">
+        <div class="header header--wrapper">
+            <div class="header--title">
+                <h2>Update Coins</h2>
+                <span>Enter withdraw coin count</span>
+            </div>
+        </div>
+        <div class="update-section">
+            <p>Enter the coin count</p>
+            <div>
+                <form id="updateForm" method="POST" action="/updateCoins" class="form2">
+                    <div class="update-count">
+                        <div class="coin ">
+                            <span class="amount--value">Rs &nbsp; 1</span>
+                            <input type="number" name="oneCount" id="oneCount" placeholder="Garb Count" min="0">
+                        </div>
+                        <div class="coin">
+                            <span class="amount--value">Rs &nbsp; 2</span>
+                            <input type="number" name="twoCount" id="twoCount" placeholder="Garb Count" min="0">
+                        </div>
+                        <div class="coin">
+                            <span class="amount--value">Rs &nbsp; 5</span>
+                            <input type="number" name="fiveCount" id="fiveCount" placeholder="Garb Count" min="0">
+                        </div>
+                        <div class="coin">
+                            <span class="amount--value">Rs &nbsp; 10</span>
+                            <input type="number" name="tenCount" id="tenCount" placeholder="Garb Count" min="0">
+                        </div>
+                    </div>
+                    <button type="submit" class="submit-btn">Submit</button>
+                </form>
+            </div>
+            <div class="last">
+                <div class="reset">
+                    <p>Coin count to Zero</p>
+                    <form action="/resetCoins" method="POST">
+                        <button type="submit" class="reset-btn">Reset</button>
+                    </form>
+                </div>
+                <div class="reset">
+                    <p>Add new Accessor</p>
+                    <form id="enrollForm" action="/enroll" method="POST">
+                        <button type="submit" class="reset-btn">Enroll</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('enrollForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const form = event.target;
+
+            try {
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(new FormData(form)).toString()
+                });
+
+                const message = await response.text();
+                if (response.ok) {
+                    alert(message);
+                } else {
+                    alert('Error: ' + message);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+    </script>
+    </body>
+  
+</html>

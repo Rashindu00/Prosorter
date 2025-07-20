@@ -1,0 +1,90 @@
+{
+  "navigation": {
+    "dashboard": "Dashboard",
+    "statistics": "Statistics",
+    "profile": "Profile",
+    "activities": "Activities",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "totalAmount": "Total Amount",
+    "dailyTransactions": "Today's Transactions",
+    "dailyTotal": "Today's Total",
+    "espDevice": "ESP Device",
+    "connected": "Connected",
+    "online": "Online",
+    "offline": "Offline",
+    "coinDistribution": "Coin Distribution",
+    "recentActivities": "Recent Activities",
+    "coinInventory": "Coin Inventory",
+    "autoRefresh": "Auto Refresh",
+    "coinOperations": "Coin Operations",
+    "withdrawCoins": "Withdraw Coins",
+    "quickActions": "Quick Actions",
+    "resetSystem": "Reset System",
+    "enrollFingerprint": "Enroll Fingerprint",
+    "exportData": "Export Data",
+    "testConnection": "Test Connection",
+    "totalWithdrawal": "Total Withdrawal"
+  },
+  "coins": {
+    "rs1": "Rs. 1 Coins",
+    "rs2": "Rs. 2 Coins", 
+    "rs5": "Rs. 5 Coins",
+    "rs10": "Rs. 10 Coins",
+    "total": "Total"
+  },
+  "actions": {
+    "login": "Login",
+    "refresh": "Refresh",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "remove": "Remove"
+  },
+  "messages": {
+    "loginSuccess": "Login successful",
+    "loginFailed": "Login failed",
+    "dataUpdated": "Data updated successfully",
+    "connectionLost": "Connection lost",
+    "connectionRestored": "Connection restored",
+    "systemReset": "System reset successfully",
+    "fingerprintEnrolled": "Fingerprint enrolled successfully",
+    "dataExported": "Data exported successfully",
+    "connectionTested": "Connection test successful",
+    "error": "An error occurred",
+    "noActivities": "No recent activities",
+    "confirmReset": "Are you sure you want to reset all coin counts to zero? This action cannot be undone.",
+    "settingsComingSoon": "Settings panel coming soon!",
+    "exportComingSoon": "Data export feature coming soon!"
+  },
+  "themes": {
+    "light": "Light Theme",
+    "dark": "Dark Theme",
+    "auto": "Auto Theme"
+  },
+  "notifications": {
+    "smsAlerts": "SMS Alerts",
+    "emailAlerts": "Email Alerts",
+    "pushNotifications": "Push Notifications",
+    "lowCoinAlert": "Low coin inventory alert",
+    "systemAlert": "System alert",
+    "securityAlert": "Security alert"
+  },
+  "reports": {
+    "dailyReport": "Daily Report",
+    "weeklyReport": "Weekly Report", 
+    "monthlyReport": "Monthly Report",
+    "customReport": "Custom Report",
+    "generateReport": "Generate Report",
+    "downloadPDF": "Download PDF",
+    "downloadExcel": "Download Excel",
+    "reportGenerated": "Report generated successfully"
+  }
+}

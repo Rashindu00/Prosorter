@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProSorter Dashboard v2.0</title>
+    <link rel="stylesheet" type="text/css" href="/css/enhanced-style.css" />
+    <link rel="stylesheet" type="text/css" href="/css/theme-system.css" />
+    <link rel="stylesheet" type="text/css" href="/css/settings-modal.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="/images/ProSorter.png" alt="ProSorter" style="width: 60px; height: 60px;">
+        </div>
+        <ul class="menu">
+            <li class="active">
+                <a href="/dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/statistics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistics</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" id="profileBtn">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" id="activitiesBtn">
+                    <i class="fas fa-history"></i>
+                    <span>Activities</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" id="settingsBtn">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+            <li class="logout">
+                <form action="/logout" method="POST" style="margin: 0;">
+                    <button type="submit" style="background: none; border: none; color: white; cursor: pointer; width: 100%; text-align: left; padding: 1rem; display: flex; align-items: center; gap: 1.5rem;">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main--content">
+        <!-- Header -->
+        <div class="header--wrapper">
+            <div class="header--title">
+                <span data-i18n="welcome">Welcome back</span>, <%= user.username %>
+                <h2 data-i18n="dashboard">Dashboard</h2>
+                <small class="text-muted"><%= currentDate %></small>
+            </div>
+            <div class="user--info">
+                <!-- Theme Toggle -->
+                <div class="theme-controls">
+                    <button id="themeToggle" class="theme-toggle-btn" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+                
+                <!-- Language Selector -->
+                <div class="language-controls">
+                    <select id="languageSelector" class="language-selector">
+                        <option value="en">English</option>
+                        <option value="si">සිංහල</option>
+                    </select>
+                </div>
+                
+                <div class="notification-badge">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" id="notificationCount">0</span>
+                </div>
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                    <span><%= user.username %></span>
+                </div>
+                <div class="status-indicator">
+                    <span id="connectionStatus" class="online" data-i18n="online">Online</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Section -->
+        <div id="alertContainer" class="alert-container" style="display: none;">
+            <div class="alert alert-success" id="successAlert">
+                <i class="fas fa-check-circle"></i>
+                <span id="successMessage"></span>
+                <button id="successAlertClose">&times;</button>
+            </div>
+            <div class="alert alert-error" id="errorAlert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span id="errorMessage"></span>
+                <button id="errorAlertClose">&times;</button>
+            </div>
+        </div>
+
+        <!-- Real-time Status Cards -->
+        <div class="status-cards">
+            <div class="status-card">
+                <div class="status-icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="status-info">
+                    <h3 id="totalAmount">Rs <%= total || 0 %></h3>
+                    <p>Total Amount</p>
+                    <span class="status-change" id="totalChange">+0.00</span>
+                </div>
+            </div>
+            <div class="status-card">
+                <div class="status-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="status-info">
+                    <h3 id="dailyTransactions"><%= dailyStats.totalTransactions || 0 %></h3>
+                    <p>Today's Transactions</p>
+                    <span class="status-change positive">+<%= dailyStats.totalTransactions || 0 %></span>
+                </div>
+            </div>
+            <div class="status-card">
+                <div class="status-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="status-info">
+                    <h3 id="dailyAmount">Rs <%= dailyStats.totalAmount || 0 %></h3>
+                    <p>Today's Total</p>
+                    <span class="status-change positive">+Rs <%= dailyStats.totalAmount || 0 %></span>
+                </div>
+            </div>
+            <div class="status-card">
+                <div class="status-icon">
+                    <i class="fas fa-fingerprint"></i>
+                </div>
+                <div class="status-info">
+                    <h3 id="deviceStatus">Connected</h3>
+                    <p>ESP Device</p>
+                    <span class="status-indicator online">Online</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="dashboard-grid">
+            <!-- Coin Distribution Chart -->
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h3>Coin Distribution</h3>
+                    <button id="refreshChartBtn" class="refresh-btn">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="coinChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="card activities-card">
+                <div class="card-header">
+                    <h3>Recent Activities</h3>
+                    <button id="loadActivitiesBtn" class="refresh-btn">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="activities-list" id="activitiesList">
+                    <% if (activities && activities.length > 0) { %>
+                        <% activities.forEach(activity => { %>
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <i class="fas fa-<%= activity.action === 'login' ? 'sign-in-alt' : activity.action === 'logout' ? 'sign-out-alt' : activity.action === 'coin_withdrawal' ? 'coins' : 'cog' %>"></i>
+                                </div>
+                                <div class="activity-details">
+                                    <p><strong><%= activity.username %></strong> <%= activity.action.replace('_', ' ') %></p>
+                                    <small><%= new Date(activity.timestamp).toLocaleString() %></small>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="no-activities">
+                            <i class="fas fa-history"></i>
+                            <p>No recent activities</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coin Management Section -->
+        <div class="coin-management">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Coin Inventory</h3>
+                    <div class="card-actions">
+                        <button id="autoRefreshBtn" class="action-btn">
+                            <i class="fas fa-sync"></i> Auto Refresh: OFF
+                        </button>
+                    </div>
+                </div>
+                <div class="coin-grid">
+                    <div class="coin-item">
+                        <div class="coin-header">
+                            <h4>Rs. 1 Coins</h4>
+                            <span class="coin-count" id="coin1Count"><%= total1 || 0 %></span>
+                        </div>
+                        <div class="coin-value">Total: Rs <span id="coin1Value"><%= total1 || 0 %></span></div>
+                        <div class="coin-progress">
+                            <div class="progress-bar" data-progress="<%= Math.min(((total1 || 0)/100)*100, 100) %>"></div>
+                        </div>
+                    </div>
+                    <div class="coin-item">
+                        <div class="coin-header">
+                            <h4>Rs. 2 Coins</h4>
+                            <span class="coin-count" id="coin2Count"><%= Math.floor((total2 || 0)/2) %></span>
+                        </div>
+                        <div class="coin-value">Total: Rs <span id="coin2Value"><%= total2 || 0 %></span></div>
+                        <div class="coin-progress">
+                            <div class="progress-bar" data-progress="<%= Math.min((Math.floor((total2 || 0)/2)/100)*100, 100) %>"></div>
+                        </div>
+                    </div>
+                    <div class="coin-item">
+                        <div class="coin-header">
+                            <h4>Rs. 5 Coins</h4>
+                            <span class="coin-count" id="coin5Count"><%= Math.floor((total5 || 0)/5) %></span>
+                        </div>
+                        <div class="coin-value">Total: Rs <span id="coin5Value"><%= total5 || 0 %></span></div>
+                        <div class="coin-progress">
+                            <div class="progress-bar" data-progress="<%= Math.min((Math.floor((total5 || 0)/5)/100)*100, 100) %>"></div>
+                        </div>
+                    </div>
+                    <div class="coin-item">
+                        <div class="coin-header">
+                            <h4>Rs. 10 Coins</h4>
+                            <span class="coin-count" id="coin10Count"><%= Math.floor((total10 || 0)/10) %></span>
+                        </div>
+                        <div class="coin-value">Total: Rs <span id="coin10Value"><%= total10 || 0 %></span></div>
+                        <div class="coin-progress">
+                            <div class="progress-bar" data-progress="<%= Math.min((Math.floor((total10 || 0)/10)/100)*100, 100) %>"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Section -->
+        <div class="action-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Coin Operations</h3>
+                </div>
+                <div class="operations-grid">
+                    <!-- Withdrawal Form -->
+                    <div class="operation-card">
+                        <h4>Withdraw Coins</h4>
+                        <form id="withdrawForm" method="POST" action="/updateCoins">
+                            <div class="input-grid">
+                                <div class="input-group">
+                                    <label for="oneCount">Rs. 1 Coins</label>
+                                    <input type="number" name="oneCount" id="oneCount" min="0" max="<%= total1 || 0 %>" placeholder="0">
+                                </div>
+                                <div class="input-group">
+                                    <label for="twoCount">Rs. 2 Coins</label>
+                                    <input type="number" name="twoCount" id="twoCount" min="0" max="<%= Math.floor((total2 || 0)/2) %>" placeholder="0">
+                                </div>
+                                <div class="input-group">
+                                    <label for="fiveCount">Rs. 5 Coins</label>
+                                    <input type="number" name="fiveCount" id="fiveCount" min="0" max="<%= Math.floor((total5 || 0)/5) %>" placeholder="0">
+                                </div>
+                                <div class="input-group">
+                                    <label for="tenCount">Rs. 10 Coins</label>
+                                    <input type="number" name="tenCount" id="tenCount" min="0" max="<%= Math.floor((total10 || 0)/10) %>" placeholder="0">
+                                </div>
+                            </div>
+                            <div class="withdrawal-summary">
+                                <p>Total Withdrawal: Rs <span id="withdrawalTotal">0</span></p>
+                            </div>
+                            <button type="submit" class="submit-btn">
+                                <i class="fas fa-hand-paper"></i> Withdraw Coins
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="operation-card">
+                        <h4>Quick Actions</h4>
+                        <div class="quick-actions">
+                            <% if (user.role === 'admin') { %>
+                            <button id="resetSystemBtn" class="action-btn danger">
+                                <i class="fas fa-reset"></i> Reset System
+                            </button>
+                            <button id="enrollFingerprintBtn" class="action-btn success">
+                                <i class="fas fa-fingerprint"></i> Enroll Fingerprint
+                            </button>
+                            <% } %>
+                            <button id="exportDataBtn" class="action-btn info">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                            <button id="testConnectionBtn" class="action-btn">
+                                <i class="fas fa-wifi"></i> Test Connection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Templates -->
+    <div id="modalOverlay" class="modal-overlay"></div>
+    
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Action</h3>
+            <p id="confirmMessage">Are you sure you want to proceed?</p>
+            <div class="modal-actions">
+                <button id="confirmCancelBtn" class="btn-secondary">Cancel</button>
+                <button id="confirmActionBtn" class="btn-danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <h3>User Profile</h3>
+            <div class="profile-info">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="profile-details">
+                    <p><strong>Username:</strong> <%= user.username %></p>
+                    <p><strong>Role:</strong> <%= user.role || 'User' %></p>
+                    <p><strong>Login Time:</strong> <span id="loginTime"></span></p>
+                    <p><strong>Session Duration:</strong> <span id="sessionDuration"></span></p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="profileCloseBtn" class="btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    
+        <div class="modal-content settings-modal">
+            <h3><i class="fas fa-cog"></i> Settings</h3>
+            
+            <!-- Theme Settings -->
+            <div class="settings-section">
+                <h4><i class="fas fa-palette"></i> Appearance</h4>
+                <div class="setting-item">
+                    <label>Theme:</label>
+                    <div class="theme-options">
+                        <button id="lightThemeBtn" class="theme-btn">
+                            <i class="fas fa-sun"></i> Light
+                        </button>
+                        <button id="darkThemeBtn" class="theme-btn">
+                            <i class="fas fa-moon"></i> Dark
+                        </button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label>Language:</label>
+                    <select id="settingsLanguageSelector">
+                        <option value="en">English</option>
+                        <option value="si">සිංහල</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="settings-section">
+                <h4><i class="fas fa-bell"></i> Notifications</h4>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="smsEnabled"> Enable SMS Alerts
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="emailEnabled"> Enable Email Alerts
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>Low Coin Threshold:</label>
+                    <input type="number" id="lowCoinThreshold" value="10" min="1" max="100">
+                </div>
+                <div class="setting-item">
+                    <button id="testSmsBtn" class="btn-info">
+                        <i class="fas fa-mobile-alt"></i> Test SMS
+                    </button>
+                    <button id="testEmailBtn" class="btn-info">
+                        <i class="fas fa-envelope"></i> Test Email
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reports Settings -->
+            <div class="settings-section">
+                <h4><i class="fas fa-chart-bar"></i> Reports</h4>
+                <div class="setting-item">
+                    <button id="dailyReportBtn" class="btn-success">
+                        <i class="fas fa-calendar-day"></i> Daily Report
+                    </button>
+                    <button id="weeklyReportBtn" class="btn-success">
+                        <i class="fas fa-calendar-week"></i> Weekly Report
+                    </button>
+                    <button id="monthlyReportBtn" class="btn-success">
+                        <i class="fas fa-calendar-alt"></i> Monthly Report
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="saveSettingsBtn" class="btn-primary">
+                    <i class="fas fa-save"></i> Save Settings
+                </button>
+                <button id="settingsCloseBtn" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+   
+
+    <script>
+        // Socket.io connection
+        const socket = io();
+        let autoRefresh = false;
+        let confirmAction = null;
+        let coinChart = null;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeChart();
+            calculateWithdrawalTotal();
+            updateSessionInfo();
+            initializeProgressBars();
+            
+            // Add event listeners for buttons
+            setupEventListeners();
+            
+            // Auto-refresh every 30 seconds if enabled
+            setInterval(() => {
+                if (autoRefresh) {
+                    loadLatestData();
+                }
+            }, 30000);
+        });
+
+        // Setup all event listeners
+        function setupEventListeners() {
+            // Sidebar navigation
+            const profileBtn = document.getElementById('profileBtn');
+            const activitiesBtn = document.getElementById('activitiesBtn');
+            const settingsBtn = document.getElementById('settingsBtn');
+            
+            if (profileBtn) profileBtn.addEventListener('click', (e) => { e.preventDefault(); showProfile(); });
+            if (activitiesBtn) activitiesBtn.addEventListener('click', (e) => { e.preventDefault(); showActivities(); });
+            if (settingsBtn) settingsBtn.addEventListener('click', (e) => { e.preventDefault(); showSettings(); });
+            
+            // Chart and activities refresh
+            const refreshChartBtn = document.getElementById('refreshChartBtn');
+            const loadActivitiesBtn = document.getElementById('loadActivitiesBtn');
+            
+            if (refreshChartBtn) refreshChartBtn.addEventListener('click', refreshChart);
+            if (loadActivitiesBtn) loadActivitiesBtn.addEventListener('click', loadActivities);
+            
+            // Auto refresh toggle
+            const autoRefreshBtn = document.getElementById('autoRefreshBtn');
+            if (autoRefreshBtn) autoRefreshBtn.addEventListener('click', autoRefreshToggle);
+            
+            // Quick actions
+            const resetSystemBtn = document.getElementById('resetSystemBtn');
+            const enrollFingerprintBtn = document.getElementById('enrollFingerprintBtn');
+            const exportDataBtn = document.getElementById('exportDataBtn');
+            const testConnectionBtn = document.getElementById('testConnectionBtn');
+            
+            if (resetSystemBtn) resetSystemBtn.addEventListener('click', confirmReset);
+            if (enrollFingerprintBtn) enrollFingerprintBtn.addEventListener('click', enrollFingerprint);
+            if (exportDataBtn) exportDataBtn.addEventListener('click', exportData);
+            if (testConnectionBtn) testConnectionBtn.addEventListener('click', testConnection);
+            
+            // Modal close buttons
+            const modalOverlay = document.getElementById('modalOverlay');
+            const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+            const confirmActionBtn = document.getElementById('confirmActionBtn');
+            const profileCloseBtn = document.getElementById('profileCloseBtn');
+            const settingsCloseBtn = document.getElementById('settingsCloseBtn');
+            
+            if (modalOverlay) modalOverlay.addEventListener('click', closeModal);
+            if (confirmCancelBtn) confirmCancelBtn.addEventListener('click', closeModal);
+            if (confirmActionBtn) confirmActionBtn.addEventListener('click', executeConfirmedAction);
+            if (profileCloseBtn) profileCloseBtn.addEventListener('click', closeModal);
+            if (settingsCloseBtn) settingsCloseBtn.addEventListener('click', closeModal);
+            
+            // Settings modal buttons
+            const lightThemeBtn = document.getElementById('lightThemeBtn');
+            const darkThemeBtn = document.getElementById('darkThemeBtn');
+            const settingsLanguageSelector = document.getElementById('settingsLanguageSelector');
+            const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+            
+            if (lightThemeBtn) lightThemeBtn.addEventListener('click', () => changeTheme('light'));
+            if (darkThemeBtn) darkThemeBtn.addEventListener('click', () => changeTheme('dark'));
+            if (settingsLanguageSelector) settingsLanguageSelector.addEventListener('change', (e) => changeLanguage(e.target.value));
+            if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveSettings);
+            
+            // Test notification buttons
+            const testSmsBtn = document.getElementById('testSmsBtn');
+            const testEmailBtn = document.getElementById('testEmailBtn');
+            
+            if (testSmsBtn) testSmsBtn.addEventListener('click', () => testNotification('sms'));
+            if (testEmailBtn) testEmailBtn.addEventListener('click', () => testNotification('email'));
+            
+            // Report generation buttons
+            const dailyReportBtn = document.getElementById('dailyReportBtn');
+            const weeklyReportBtn = document.getElementById('weeklyReportBtn');
+            const monthlyReportBtn = document.getElementById('monthlyReportBtn');
+            
+            if (dailyReportBtn) dailyReportBtn.addEventListener('click', () => generateReport('daily'));
+            if (weeklyReportBtn) weeklyReportBtn.addEventListener('click', () => generateReport('weekly'));
+            if (monthlyReportBtn) monthlyReportBtn.addEventListener('click', () => generateReport('monthly'));
+            
+            // Alert close buttons
+            const successAlertClose = document.getElementById('successAlertClose');
+            const errorAlertClose = document.getElementById('errorAlertClose');
+            
+            if (successAlertClose) successAlertClose.addEventListener('click', () => closeAlert('successAlert'));
+            if (errorAlertClose) errorAlertClose.addEventListener('click', () => closeAlert('errorAlert'));
+        }
+
+        // Socket event listeners
+        socket.on('connect', () => {
+            document.getElementById('connectionStatus').textContent = 'Online';
+            document.getElementById('connectionStatus').className = 'online';
+        });
+
+        socket.on('disconnect', () => {
+            document.getElementById('connectionStatus').textContent = 'Offline';
+            document.getElementById('connectionStatus').className = 'offline';
+        });
+
+        socket.on('coinUpdate', (data) => {
+            updateCoinDisplay(data);
+            showAlert('Coin data updated successfully!', 'success');
+        });
+
+        // Chart initialization
+        function initializeChart() {
+            const ctx = document.getElementById('coinChart').getContext('2d');
+            const chartData = [
+                parseInt('<%= total1 || 0 %>'),
+                parseInt('<%= total2 || 0 %>'),
+                parseInt('<%= total5 || 0 %>'),
+                parseInt('<%= total10 || 0 %>')
+            ];
+            
+            coinChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Rs. 1', 'Rs. 2', 'Rs. 5', 'Rs. 10'],
+                    datasets: [{
+                        data: chartData,
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize progress bars
+        function initializeProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-bar[data-progress]');
+            progressBars.forEach(bar => {
+                const progress = parseFloat(bar.getAttribute('data-progress')) || 0;
+                bar.style.width = Math.min(progress, 100) + '%';
+            });
+        }
+
+        // Update coin display
+        function updateCoinDisplay(data) {
+            // Update coin counts (number of coins)
+            document.getElementById('coin1Count').textContent = data.coin1 || 0;
+            document.getElementById('coin2Count').textContent = Math.floor((data.coin2 || 0) / 2);
+            document.getElementById('coin5Count').textContent = Math.floor((data.coin5 || 0) / 5);
+            document.getElementById('coin10Count').textContent = Math.floor((data.coin10 || 0) / 10);
+            
+            // Update coin values (total value)
+            document.getElementById('coin1Value').textContent = data.coin1 || 0;
+            document.getElementById('coin2Value').textContent = data.coin2 || 0;
+            document.getElementById('coin5Value').textContent = data.coin5 || 0;
+            document.getElementById('coin10Value').textContent = data.coin10 || 0;
+            
+            // Update total amount
+            document.getElementById('totalAmount').textContent = 'Rs ' + (data.total || 0);
+
+            // Update progress bars
+            const progressBars = document.querySelectorAll('.progress-bar');
+            const coinCounts = [
+                data.coin1 || 0,
+                Math.floor((data.coin2 || 0) / 2),
+                Math.floor((data.coin5 || 0) / 5),
+                Math.floor((data.coin10 || 0) / 10)
+            ];
+            
+            progressBars.forEach((bar, index) => {
+                if (index < coinCounts.length) {
+                    const progress = Math.min((coinCounts[index] / 100) * 100, 100);
+                    bar.style.width = progress + '%';
+                }
+            });
+
+            // Update chart with coin values (not counts)
+            if (coinChart) {
+                coinChart.data.datasets[0].data = [
+                    data.coin1 || 0, 
+                    data.coin2 || 0, 
+                    data.coin5 || 0, 
+                    data.coin10 || 0
+                ];
+                coinChart.update();
+            }
+        }
+
+        // Calculate withdrawal total
+        function calculateWithdrawalTotal() {
+            const inputs = ['oneCount', 'twoCount', 'fiveCount', 'tenCount'];
+            const multipliers = [1, 2, 5, 10];
+            
+            inputs.forEach((inputId, index) => {
+                document.getElementById(inputId).addEventListener('input', function() {
+                    let total = 0;
+                    inputs.forEach((id, i) => {
+                        const value = parseInt(document.getElementById(id).value) || 0;
+                        total += value * multipliers[i];
+                    });
+                    document.getElementById('withdrawalTotal').textContent = total;
+                });
+            });
+        }
+
+        // Auto refresh toggle
+        function autoRefreshToggle() {
+            autoRefresh = !autoRefresh;
+            const btn = document.getElementById('autoRefreshBtn');
+            btn.innerHTML = `<i class="fas fa-sync"></i> Auto Refresh: ${autoRefresh ? 'ON' : 'OFF'}`;
+            btn.className = autoRefresh ? 'action-btn success' : 'action-btn';
+        }
+
+        // Load latest data
+        async function loadLatestData() {
+            try {
+                const response = await fetch('/api/coins');
+                const data = await response.json();
+                updateCoinDisplay(data);
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        // Load activities
+        async function loadActivities() {
+            try {
+                const response = await fetch('/api/activities');
+                const activities = await response.json();
+                
+                const container = document.getElementById('activitiesList');
+                container.innerHTML = '';
+                
+                if (activities.length === 0) {
+                    container.innerHTML = '<div class="no-activities"><i class="fas fa-history"></i><p>No recent activities</p></div>';
+                    return;
+                }
+                
+                activities.forEach(activity => {
+                    const activityItem = document.createElement('div');
+                    activityItem.className = 'activity-item';
+                    activityItem.innerHTML = `
+                        <div class="activity-icon">
+                            <i class="fas fa-${getActivityIcon(activity.action)}"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p><strong>${activity.username}</strong> ${activity.action.replace('_', ' ')}</p>
+                            <small>${new Date(activity.timestamp).toLocaleString()}</small>
+                        </div>
+                    `;
+                    container.appendChild(activityItem);
+                });
+            } catch (error) {
+                console.error('Error loading activities:', error);
+            }
+        }
+
+        function getActivityIcon(action) {
+            const icons = {
+                'login': 'sign-in-alt',
+                'logout': 'sign-out-alt',
+                'coin_withdrawal': 'coins',
+                'system_reset': 'reset',
+                'fingerprint_enrollment': 'fingerprint'
+            };
+            return icons[action] || 'cog';
+        }
+
+        // Modal functions
+        function showModal(modalId) {
+            console.log('showModal called with ID:', modalId);
+            const overlay = document.getElementById('modalOverlay');
+            const modal = document.getElementById(modalId);
+            console.log('Overlay element:', overlay);
+            console.log('Modal element:', modal);
+            
+            // Add modal-open class to body
+            document.body.classList.add('modal-open');
+            
+            if (overlay) {
+                overlay.style.display = 'block';
+                console.log('Overlay display set to block');
+            }
+            if (modal) {
+                modal.style.display = 'block';
+                console.log('Modal display set to block');
+            }
+        }
+
+        function closeModal() {
+            // Remove modal-open class from body
+            document.body.classList.remove('modal-open');
+            
+            document.getElementById('modalOverlay').style.display = 'none';
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+
+        function showProfile() {
+            updateSessionInfo();
+            showModal('profileModal');
+        }
+
+        function showActivities() {
+            loadActivities();
+        }
+
+        function showSettings() {
+            console.log('showSettings called');
+            loadCurrentSettings();
+            console.log('About to show modal');
+            showModal('settingsModal');
+            console.log('Modal should be visible now');
+        }
+
+        // Settings Functions
+        function loadCurrentSettings() {
+            console.log('loadCurrentSettings called');
+            fetch('/api/settings')
+                .then(response => {
+                    console.log('Settings response:', response);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Settings data:', data);
+                    if (data.success) {
+                        // Update theme buttons
+                        const theme = data.settings.theme || 'light';
+                        const lightBtn = document.getElementById('lightThemeBtn');
+                        const darkBtn = document.getElementById('darkThemeBtn');
+                        
+                        if (lightBtn) lightBtn.classList.toggle('active', theme === 'light');
+                        if (darkBtn) darkBtn.classList.toggle('active', theme === 'dark');
+                        
+                        // Update language selector
+                        const langSelector = document.getElementById('settingsLanguageSelector');
+                        if (langSelector) langSelector.value = data.settings.language || 'en';
+                        
+                        // Load notification settings if available
+                        if (data.settings.notifications) {
+                            const smsEnabled = document.getElementById('smsEnabled');
+                            const emailEnabled = document.getElementById('emailEnabled');
+                            const threshold = document.getElementById('lowCoinThreshold');
+                            
+                            if (smsEnabled) smsEnabled.checked = data.settings.notifications.smsEnabled || false;
+                            if (emailEnabled) emailEnabled.checked = data.settings.notifications.emailEnabled || false;
+                            if (threshold) threshold.value = data.settings.notifications.lowCoinThreshold || 10;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading settings:', error);
+                });
+        }
+
+        function changeTheme(theme) {
+            fetch('/api/settings/theme', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ theme })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    applyTheme(theme);
+                    updateThemeButtons(theme);
+                    showAlert(`Theme changed to ${theme} mode`, 'success');
+                } else {
+                    showAlert('Failed to save theme preference', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving theme:', error);
+                showAlert('Failed to save theme preference', 'error');
+            });
+        }
+
+        function updateThemeButtons(theme) {
+            document.getElementById('lightThemeBtn').classList.toggle('active', theme === 'light');
+            document.getElementById('darkThemeBtn').classList.toggle('active', theme === 'dark');
+        }
+
+        function changeLanguage(language) {
+            fetch('/api/settings/language', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ language })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadTranslations(language);
+                    showAlert('Language changed successfully', 'success');
+                } else {
+                    showAlert('Failed to save language preference', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving language:', error);
+                showAlert('Failed to save language preference', 'error');
+            });
+        }
+
+        function saveSettings() {
+            const notificationSettings = {
+                smsEnabled: document.getElementById('smsEnabled').checked,
+                emailEnabled: document.getElementById('emailEnabled').checked,
+                lowCoinThreshold: parseInt(document.getElementById('lowCoinThreshold').value) || 10
+            };
+
+            fetch('/api/notifications/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(notificationSettings)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Settings saved successfully', 'success');
+                    closeModal();
+                } else {
+                    showAlert('Failed to save settings', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving settings:', error);
+                showAlert('Failed to save settings', 'error');
+            });
+        }
+
+        // Alert functions
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.getElementById(type + 'Alert');
+            const messageSpan = document.getElementById(type + 'Message');
+            
+            messageSpan.textContent = message;
+            alertContainer.style.display = 'block';
+            alert.style.display = 'flex';
+            
+            setTimeout(() => {
+                closeAlert(type + 'Alert');
+            }, 5000);
+        }
+
+        function closeAlert(alertId) {
+            document.getElementById(alertId).style.display = 'none';
+            const visibleAlerts = document.querySelectorAll('.alert:not([style*="display: none"])');
+            if (visibleAlerts.length === 0) {
+                document.getElementById('alertContainer').style.display = 'none';
+            }
+        }
+
+        // Action functions
+        function confirmReset() {
+            confirmAction = () => {
+                fetch('/resetCoins', { method: 'POST' })
+                    .then(() => {
+                        showAlert('System reset successfully!', 'success');
+                        loadLatestData();
+                    })
+                    .catch(() => showAlert('Failed to reset system', 'error'));
+            };
+            
+            document.getElementById('confirmMessage').textContent = 'Are you sure you want to reset all coin counts to zero? This action cannot be undone.';
+            showModal('confirmModal');
+        }
+
+        function enrollFingerprint() {
+            fetch('/enroll', { method: 'POST' })
+                .then(response => response.text())
+                .then(message => {
+                    showAlert(message, 'success');
+                })
+                .catch(() => showAlert('Failed to enroll fingerprint', 'error'));
+        }
+
+        function executeConfirmedAction() {
+            if (confirmAction) {
+                confirmAction();
+                confirmAction = null;
+            }
+            closeModal();
+        }
+
+        function exportData() {
+            showAlert('Data export feature coming soon!', 'info');
+        }
+
+        function testConnection() {
+            fetch('/health')
+                .then(response => response.json())
+                .then(data => {
+                    showAlert('Connection test successful! Server status: ' + data.status, 'success');
+                })
+                .catch(() => showAlert('Connection test failed', 'error'));
+        }
+
+        function refreshChart() {
+            loadLatestData();
+            showAlert('Chart refreshed!', 'success');
+        }
+
+        function updateSessionInfo() {
+            try {
+                const loginTimeStr = '<%= user.loginTime %>';
+                const loginTime = new Date(loginTimeStr);
+                const now = new Date();
+                const duration = Math.floor((now - loginTime) / 1000 / 60); // minutes
+                
+                const loginTimeElement = document.getElementById('loginTime');
+                const sessionDurationElement = document.getElementById('sessionDuration');
+                
+                if (loginTimeElement && sessionDurationElement) {
+                    loginTimeElement.textContent = loginTime.toLocaleString();
+                    sessionDurationElement.textContent = duration + ' minutes';
+                }
+            } catch (error) {
+                console.error('Error updating session info:', error);
+            }
+        }
+
+        // Form validation
+        document.getElementById('withdrawForm').addEventListener('submit', function(e) {
+            const total = parseInt(document.getElementById('withdrawalTotal').textContent);
+            if (total <= 0) {
+                e.preventDefault();
+                showAlert('Please enter valid coin counts for withdrawal', 'error');
+            }
+        });
+
+        // ===== ADVANCED FEATURES =====
+        
+        // Theme Management
+        let currentTheme = 'light';
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const htmlElement = document.documentElement;
+        
+        // Load saved theme
+        function loadTheme() {
+            fetch('/api/settings')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        currentTheme = data.settings.theme || 'light';
+                        applyTheme(currentTheme);
+                        updateThemeIcon();
+                        
+                        // Also load language
+                        if (data.settings.language) {
+                            document.getElementById('languageSelector').value = data.settings.language;
+                            loadTranslations(data.settings.language);
+                        }
+                    }
+                })
+                .catch(error => console.error('Error loading settings:', error));
+        }
+        
+        function applyTheme(theme) {
+            htmlElement.setAttribute('data-theme', theme);
+            currentTheme = theme;
+        }
+        
+        function updateThemeIcon() {
+            const icon = themeToggleBtn.querySelector('i');
+            if (currentTheme === 'dark') {
+                icon.className = 'fas fa-sun';
+                themeToggleBtn.title = 'Switch to Light Mode';
+            } else {
+                icon.className = 'fas fa-moon';
+                themeToggleBtn.title = 'Switch to Dark Mode';
+            }
+        }
+        
+        themeToggleBtn.addEventListener('click', function() {
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(newTheme);
+            updateThemeIcon();
+            
+            // Save theme preference
+            fetch('/api/settings/theme', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ theme: newTheme })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(`Theme changed to ${newTheme} mode`, 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving theme:', error);
+                showAlert('Failed to save theme preference', 'error');
+            });
+        });
+        
+        // Language Management
+        let currentTranslations = {};
+        
+        function loadTranslations(language) {
+            fetch(`/api/translations/${language}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        currentTranslations = data.translations;
+                        applyTranslations();
+                    }
+                })
+                .catch(error => console.error('Error loading translations:', error));
+        }
+        
+        function applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (currentTranslations[key]) {
+                    element.textContent = currentTranslations[key];
+                }
+            });
+        }
+        
+        document.getElementById('languageSelector').addEventListener('change', function() {
+            const selectedLanguage = this.value;
+            
+            // Save language preference
+            fetch('/api/settings/language', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ language: selectedLanguage })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadTranslations(selectedLanguage);
+                    showAlert('Language changed successfully', 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving language:', error);
+                showAlert('Failed to save language preference', 'error');
+            });
+        });
+        
+        // Advanced Reporting Functions
+        window.generateReport = function(type) {
+            showLoading('Generating report...');
+            
+            fetch(`/api/reports/${type}`)
+                .then(response => response.json())
+                .then(data => {
+                    hideLoading();
+                    if (data.success) {
+                        displayReportData(data.data, type);
+                    } else {
+                        showAlert('Failed to generate report', 'error');
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    console.error('Error generating report:', error);
+                    showAlert('Failed to generate report', 'error');
+                });
+        };
+        
+        window.exportReport = function(type, format) {
+            showLoading(`Exporting ${format.toUpperCase()} report...`);
+            
+            fetch('/api/reports/export', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ type, format })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error('Export failed');
+            })
+            .then(blob => {
+                hideLoading();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `prosorter-${type}-report.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                showAlert(`${format.toUpperCase()} report downloaded successfully`, 'success');
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('Error exporting report:', error);
+                showAlert('Failed to export report', 'error');
+            });
+        };
+        
+        function displayReportData(data, type) {
+            // Create and show report modal
+            const reportModal = document.createElement('div');
+            reportModal.className = 'modal-overlay';
+            reportModal.innerHTML = `
+                <div class="modal-content report-modal">
+                    <div class="modal-header">
+                        <h3>${type.toUpperCase()} Report</h3>
+                        <button onclick="this.closest('.modal-overlay').remove()" class="close-btn">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="report-summary">
+                            <div class="report-stat">
+                                <h4>Total Transactions</h4>
+                                <span>${data.totalTransactions}</span>
+                            </div>
+                            <div class="report-stat">
+                                <h4>Login Count</h4>
+                                <span>${data.loginCount}</span>
+                            </div>
+                            <div class="report-stat">
+                                <h4>Withdrawals</h4>
+                                <span>${data.withdrawalCount}</span>
+                            </div>
+                            <div class="report-stat">
+                                <h4>Current Total</h4>
+                                <span>Rs. ${data.currentInventory.total}</span>
+                            </div>
+                        </div>
+                        <div class="report-actions">
+                            <button onclick="exportReport('${type}', 'excel')" class="btn btn-success">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </button>
+                            <button onclick="exportReport('${type}', 'pdf')" class="btn btn-danger">
+                                <i class="fas fa-file-pdf"></i> Export PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(reportModal);
+        }
+        
+        // Notification System
+        window.testNotification = function(type) {
+            fetch('/api/notifications/test', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ type })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(`Test ${type} notification sent successfully`, 'success');
+                } else {
+                    showAlert(`Failed to send test ${type} notification`, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending test notification:', error);
+                showAlert('Failed to send test notification', 'error');
+            });
+        };
+        
+        // Loading indicator functions
+        function showLoading(message = 'Loading...') {
+            const loader = document.createElement('div');
+            loader.id = 'loadingIndicator';
+            loader.className = 'loading-overlay';
+            loader.innerHTML = `
+                <div class="loading-content">
+                    <div class="spinner"></div>
+                    <p>${message}</p>
+                </div>
+            `;
+            document.body.appendChild(loader);
+        }
+        
+        function hideLoading() {
+            const loader = document.getElementById('loadingIndicator');
+            if (loader) {
+                loader.remove();
+            }
+        }
+        
+        // Simple test function for debugging
+        window.testModal = function() {
+            console.log('Testing modal functionality...');
+            const overlay = document.getElementById('modalOverlay');
+            const modal = document.getElementById('settingsModal');
+            
+            if (!overlay) {
+                console.error('modalOverlay not found!');
+                return false;
+            }
+            
+            if (!modal) {
+                console.error('settingsModal not found!');
+                return false;
+            }
+            
+            console.log('Setting overlay to block...');
+            overlay.style.display = 'block';
+            overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.zIndex = '1000';
+            
+            console.log('Setting modal to block...');
+            modal.style.display = 'block';
+            modal.style.position = 'fixed';
+            modal.style.top = '50%';
+            modal.style.left = '50%';
+            modal.style.transform = 'translate(-50%, -50%)';
+            modal.style.zIndex = '1001';
+            modal.style.background = 'white';
+            modal.style.padding = '20px';
+            modal.style.borderRadius = '8px';
+            modal.style.maxWidth = '600px';
+            modal.style.width = '90%';
+            
+            console.log('Modal should be visible now!');
+            return true;
+        };
+        
+        // Initialize advanced features
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            
+            // Debug modal elements
+            console.log('Modal elements check:');
+            console.log('modalOverlay:', document.getElementById('modalOverlay'));
+            console.log('settingsModal:', document.getElementById('settingsModal'));
+            console.log('confirmModal:', document.getElementById('confirmModal'));
+            console.log('profileModal:', document.getElementById('profileModal'));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "coins": {
+      ".indexOn": ["timestamp"]
+    },
+    "activities": {
+      ".indexOn": ["timestamp", "username"]
+    },
+    "users": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "statistics": {
+      ".indexOn": ["date", "timestamp"]
+    }
+  }
+}
