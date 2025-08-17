@@ -656,14 +656,8 @@
                 profileBtn.addEventListener('click', (e) => { 
                     console.log('🔥 Profile button clicked!');
                     e.preventDefault(); 
-                    console.log('⚠️ Calling showProfile function...');
                     showProfile(); 
-                    console.log('⚠️ showProfile function called');
                 });
-                
-                // Add a temporary test to make sure the button is clickable
-                profileBtn.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
-                profileBtn.title = 'Profile button is ready to click';
             } else {
                 console.error('❌ Profile button not found!');
             }
@@ -673,14 +667,8 @@
                 activitiesBtn.addEventListener('click', (e) => { 
                     console.log('🔥 Activities button clicked!');
                     e.preventDefault(); 
-                    console.log('⚠️ Calling showActivities function...');
                     showActivities(); 
-                    console.log('⚠️ showActivities function called');
                 });
-                
-                // Add a temporary test to make sure the button is clickable
-                activitiesBtn.style.backgroundColor = 'rgba(0, 255, 0, 0.1)';
-                activitiesBtn.title = 'Activities button is ready to click';
             } else {
                 console.error('❌ Activities button not found!');
             }
@@ -963,20 +951,16 @@
                 console.log('📋 Added modal-open class to body');
                 
                 if (overlay) {
-                    // Use CSS class instead of inline style
-                    overlay.classList.add('modal-overlay-visible');
-                    overlay.style.setProperty('display', 'block', 'important');
-                    console.log('✅ Overlay made visible with class and important style');
+                    overlay.style.display = 'block';
+                    console.log('✅ Overlay display set to block');
                     console.log('📋 Overlay computed style:', window.getComputedStyle(overlay).display);
                 } else {
                     console.error('❌ modalOverlay element not found!');
                 }
                 
                 if (modal) {
-                    // Use CSS class instead of inline style
-                    modal.classList.add('modal-visible');
-                    modal.style.setProperty('display', 'block', 'important');
-                    console.log('✅ Modal made visible with class and important style');
+                    modal.style.display = 'block';
+                    console.log('✅ Modal display set to block');
                     console.log('📋 Modal computed style:', window.getComputedStyle(modal).display);
                     console.log('📋 Modal position:', window.getComputedStyle(modal).position);
                     console.log('📋 Modal z-index:', window.getComputedStyle(modal).zIndex);
@@ -998,25 +982,13 @@
         }
 
         function closeModal() {
-            console.log('🔍 closeModal called');
-            
             // Remove modal-open class from body
             document.body.classList.remove('modal-open');
             
-            // Hide overlay
-            const overlay = document.getElementById('modalOverlay');
-            if (overlay) {
-                overlay.style.display = 'none';
-                overlay.classList.remove('modal-overlay-visible');
-            }
-            
-            // Hide all modals
+            document.getElementById('modalOverlay').style.display = 'none';
             document.querySelectorAll('.modal').forEach(modal => {
                 modal.style.display = 'none';
-                modal.classList.remove('modal-visible');
             });
-            
-            console.log('✅ All modals closed');
         }
 
         function showProfile() {

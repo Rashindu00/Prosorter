@@ -743,8 +743,7 @@ body.modal-open {
     padding: 0 !important;
 }
 
-.modal-overlay[style*="display: block"],
-.modal-overlay.modal-overlay-visible {
+.modal-overlay[style*="display: block"] {
     display: block !important;
 }
 
@@ -767,8 +766,7 @@ body.modal-open {
     padding: 0 !important;
 }
 
-.modal[style*="display: block"],
-.modal.modal-visible {
+.modal[style*="display: block"] {
     display: block !important;
 }
 
