@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 500px; 
+            margin: 100px auto; 
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .form-group { 
+            margin: 15px 0; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="password"] { 
+            width: 100%; 
+            padding: 12px; 
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            background: #28a745;
+            color: white; 
+            border: none; 
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover { 
+            background: #218838; 
+        }
+        .test-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .error { background: #dc3545; }
+        .success { background: #28a745; }
+        .info { background: #17a2b8; }
+    </style>
+</head>
+<body>
+    <h1>🔐 ProSorter Login Test</h1>
+    
+    <div class="test-info">
+        <h3>📋 Test Credentials:</h3>
+        <p><strong>Username:</strong> admin</p>
+        <p><strong>Password:</strong> admin123</p>
+        <p><strong>Server:</strong> http://localhost:3000</p>
+    </div>
+
+    <form id="loginForm" method="POST" action="/login">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="admin" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" value="admin123" required>
+        </div>
+        
+        <button type="submit" id="loginBtn">🚀 Sign In to ProSorter</button>
+    </form>
+
+    <div id="status" class="status info" style="display: none;">
+        Ready to test login...
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const status = document.getElementById('status');
+        const btn = document.getElementById('loginBtn');
+
+        form.addEventListener('submit', function(e) {
+            status.style.display = 'block';
+            status.className = 'status info';
+            status.textContent = '🔄 Attempting login...';
+            
+            btn.textContent = '🔄 Signing In...';
+            btn.disabled = true;
+            
+            console.log('Form submitted with:', {
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value,
+                action: form.action,
+                method: form.method
+            });
+            
+            // Let the form submit normally
+            // If successful, it will redirect to dashboard
+            // If failed, it will return with error message
+        });
+
+        // Test server connectivity
+        fetch('/')
+            .then(response => {
+                if (response.ok) {
+                    console.log('✅ Server is responding');
+                } else {
+                    console.log('⚠️ Server responded with status:', response.status);
+                }
+            })
+            .catch(error => {
+                console.error('❌ Server connection failed:', error);
+                status.style.display = 'block';
+                status.className = 'status error';
+                status.textContent = '❌ Cannot connect to server. Make sure it\'s running on port 3000';
+            });
+    </script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <title>Logo Test</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .logo-display {
+            width: 150px;
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-icon {
+            font-size: 3rem;
+            color: #ffdd00;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 8px rgba(255, 221, 0, 0.5);
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        .logo-letters {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: white;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { 
+                transform: translateY(0) scale(1); 
+            }
+            50% { 
+                transform: translateY(-8px) scale(1.1); 
+            }
+        }
+
+        .test-message {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .fallback-test {
+            margin-top: 50px;
+            color: white;
+            text-align: center;
+        }
+
+        .icon-test {
+            font-size: 2rem;
+            margin: 10px;
+            color: #ffdd00;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-message">ProSorter Logo Test</div>
+    
+    <div class="logo-display">
+        <div class="logo-icon">
+            <i class="fas fa-coins"></i>
+        </div>
+        <div class="logo-letters">PS</div>
+    </div>
+
+    <div class="fallback-test">
+        <p>FontAwesome Icon Tests:</p>
+        <i class="fas fa-coins icon-test" title="Coins"></i>
+        <i class="fas fa-coin icon-test" title="Coin"></i>
+        <i class="fas fa-money-bill icon-test" title="Money"></i>
+        <i class="fas fa-dollar-sign icon-test" title="Dollar"></i>
+        <i class="fas fa-rupee-sign icon-test" title="Rupee"></i>
+        <i class="fas fa-circle icon-test" title="Circle"></i>
+        <i class="fas fa-cog icon-test" title="Cog"></i>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded');
+            
+            // Check if FontAwesome loaded
+            const testIcon = document.querySelector('.fas.fa-coins');
+            if (testIcon) {
+                const computedStyle = window.getComputedStyle(testIcon, ':before');
+                console.log('FontAwesome icon content:', computedStyle.content);
+                
+                if (computedStyle.content && computedStyle.content !== 'none') {
+                    console.log('✅ FontAwesome loaded successfully');
+                } else {
+                    console.log('❌ FontAwesome not loaded properly');
+                }
+            }
+
+            // Visual test
+            setTimeout(() => {
+                const logoIcon = document.querySelector('.logo-icon');
+                if (logoIcon && logoIcon.offsetHeight > 0) {
+                    console.log('✅ Logo icon is visible');
+                    console.log('Logo icon dimensions:', logoIcon.offsetWidth, 'x', logoIcon.offsetHeight);
+                } else {
+                    console.log('❌ Logo icon is not visible');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

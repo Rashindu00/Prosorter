@@ -336,29 +336,207 @@
 
     <!-- Profile Modal -->
     <div id="profileModal" class="modal">
-        <div class="modal-content">
-            <h3>User Profile</h3>
-            <div class="profile-info">
-                <div class="profile-avatar">
-                    <i class="fas fa-user-circle"></i>
-                </div>
-                <div class="profile-details">
-                    <p><strong>Username:</strong> <%= user.username %></p>
-                    <p><strong>Role:</strong> <%= user.role || 'User' %></p>
-                    <p><strong>Login Time:</strong> <span id="loginTime"></span></p>
-                    <p><strong>Session Duration:</strong> <span id="sessionDuration"></span></p>
+        <div class="modal-content profile-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-user"></i> User Profile</h3>
+                <button class="modal-close-btn" onclick="closeModal()" aria-label="Close Profile">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="profile-container">
+                <div class="profile-main">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar-large">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="profile-status">
+                            <span class="status-badge online">
+                                <i class="fas fa-circle"></i> Online
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-info-grid">
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <h4><i class="fas fa-id-card"></i> Account Information</h4>
+                            </div>
+                            <div class="profile-card-body">
+                                <div class="info-item">
+                                    <label>Username:</label>
+                                    <span><%= user.username %></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Role:</label>
+                                    <span class="role-badge <%= (user.role || 'user').toLowerCase() %>">
+                                        <i class="fas fa-<%= user.role === 'admin' ? 'crown' : 'user' %>"></i>
+                                        <%= user.role || 'User' %>
+                                    </span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Account Type:</label>
+                                    <span><%= user.role === 'admin' ? 'Administrator' : 'Standard User' %></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <h4><i class="fas fa-clock"></i> Session Information</h4>
+                            </div>
+                            <div class="profile-card-body">
+                                <div class="info-item">
+                                    <label>Login Time:</label>
+                                    <span id="loginTime">Loading...</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Session Duration:</label>
+                                    <span id="sessionDuration">Loading...</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Last Activity:</label>
+                                    <span id="lastActivity">Just now</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <h4><i class="fas fa-chart-line"></i> Activity Summary</h4>
+                            </div>
+                            <div class="profile-card-body">
+                                <div class="activity-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-number" id="userLoginCount">0</div>
+                                        <div class="stat-label">Total Logins</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number" id="userWithdrawals">0</div>
+                                        <div class="stat-label">Withdrawals</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number" id="userActions">0</div>
+                                        <div class="stat-label">Total Actions</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+            
             <div class="modal-actions">
+                <button onclick="refreshProfile()" class="btn-info">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
                 <button id="profileCloseBtn" class="btn-primary">Close</button>
             </div>
         </div>
     </div>
 
+    <!-- Activities Modal -->
+    <div id="activitiesModal" class="modal">
+        <div class="modal-content activities-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-history"></i> Activity History</h3>
+                <button class="modal-close-btn" onclick="closeModal()" aria-label="Close Activities">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="activities-container">
+                <div class="activities-header">
+                    <div class="activities-controls">
+                        <div class="filter-group">
+                            <label>Filter by Action:</label>
+                            <select id="activityFilter">
+                                <option value="all">All Activities</option>
+                                <option value="login">Login</option>
+                                <option value="logout">Logout</option>
+                                <option value="coin_withdrawal">Withdrawals</option>
+                                <option value="system_reset">System Reset</option>
+                            </select>
+                        </div>
+                        <div class="search-group">
+                            <label>Search:</label>
+                            <input type="text" id="activitySearch" placeholder="Search activities...">
+                        </div>
+                        <button onclick="refreshActivities()" class="btn-info">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="activities-stats">
+                    <div class="activity-stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4 id="totalLogins">0</h4>
+                            <p>Total Logins</p>
+                        </div>
+                    </div>
+                    <div class="activity-stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4 id="totalWithdrawals">0</h4>
+                            <p>Withdrawals</p>
+                        </div>
+                    </div>
+                    <div class="activity-stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4 id="totalActivities">0</h4>
+                            <p>Total Activities</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="activities-list-container">
+                    <div class="activities-list-header">
+                        <h4>Recent Activities</h4>
+                        <div class="list-controls">
+                            <button onclick="exportActivities()" class="btn-success">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button onclick="clearActivities()" class="btn-danger">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                    <div class="activities-list-body" id="modalActivitiesList">
+                        <div class="loading-activities">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading activities...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button onclick="showActivityDetails()" class="btn-info">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
+                <button onclick="closeModal()" class="btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Settings Modal -->
-    
+    <div id="settingsModal" class="modal">
         <div class="modal-content settings-modal">
-            <h3><i class="fas fa-cog"></i> Settings</h3>
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> Settings</h3>
+                <button class="modal-close-btn" onclick="closeModal()" aria-label="Close Settings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
             
             <!-- Theme Settings -->
             <div class="settings-section">
@@ -433,6 +611,7 @@
                 <button id="settingsCloseBtn" class="btn-secondary">Cancel</button>
             </div>
         </div>
+    </div>
    
 
     <script>
@@ -467,9 +646,39 @@
             const activitiesBtn = document.getElementById('activitiesBtn');
             const settingsBtn = document.getElementById('settingsBtn');
             
-            if (profileBtn) profileBtn.addEventListener('click', (e) => { e.preventDefault(); showProfile(); });
-            if (activitiesBtn) activitiesBtn.addEventListener('click', (e) => { e.preventDefault(); showActivities(); });
-            if (settingsBtn) settingsBtn.addEventListener('click', (e) => { e.preventDefault(); showSettings(); });
+            console.log('Setting up event listeners');
+            console.log('profileBtn:', profileBtn);
+            console.log('activitiesBtn:', activitiesBtn);
+            console.log('settingsBtn:', settingsBtn);
+            
+            if (profileBtn) {
+                console.log('✅ Profile button found, adding event listener');
+                profileBtn.addEventListener('click', (e) => { 
+                    console.log('🔥 Profile button clicked!');
+                    e.preventDefault(); 
+                    showProfile(); 
+                });
+            } else {
+                console.error('❌ Profile button not found!');
+            }
+            
+            if (activitiesBtn) {
+                console.log('✅ Activities button found, adding event listener');
+                activitiesBtn.addEventListener('click', (e) => { 
+                    console.log('🔥 Activities button clicked!');
+                    e.preventDefault(); 
+                    showActivities(); 
+                });
+            } else {
+                console.error('❌ Activities button not found!');
+            }
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', (e) => { 
+                    console.log('Settings button clicked');
+                    e.preventDefault(); 
+                    showSettings(); 
+                });
+            }
             
             // Chart and activities refresh
             const refreshChartBtn = document.getElementById('refreshChartBtn');
@@ -726,22 +935,49 @@
 
         // Modal functions
         function showModal(modalId) {
-            console.log('showModal called with ID:', modalId);
-            const overlay = document.getElementById('modalOverlay');
-            const modal = document.getElementById(modalId);
-            console.log('Overlay element:', overlay);
-            console.log('Modal element:', modal);
+            console.log('🔍 showModal called with ID:', modalId);
             
-            // Add modal-open class to body
-            document.body.classList.add('modal-open');
-            
-            if (overlay) {
-                overlay.style.display = 'block';
-                console.log('Overlay display set to block');
-            }
-            if (modal) {
-                modal.style.display = 'block';
-                console.log('Modal display set to block');
+            try {
+                const overlay = document.getElementById('modalOverlay');
+                const modal = document.getElementById(modalId);
+                
+                console.log('📋 Elements found:');
+                console.log('   - Overlay element:', overlay);
+                console.log('   - Modal element:', modal);
+                console.log('   - Modal ID being searched:', modalId);
+                
+                // Add modal-open class to body
+                document.body.classList.add('modal-open');
+                console.log('📋 Added modal-open class to body');
+                
+                if (overlay) {
+                    overlay.style.display = 'block';
+                    console.log('✅ Overlay display set to block');
+                    console.log('📋 Overlay computed style:', window.getComputedStyle(overlay).display);
+                } else {
+                    console.error('❌ modalOverlay element not found!');
+                }
+                
+                if (modal) {
+                    modal.style.display = 'block';
+                    console.log('✅ Modal display set to block');
+                    console.log('📋 Modal computed style:', window.getComputedStyle(modal).display);
+                    console.log('📋 Modal position:', window.getComputedStyle(modal).position);
+                    console.log('📋 Modal z-index:', window.getComputedStyle(modal).zIndex);
+                } else {
+                    console.error('❌ Modal element not found! ID:', modalId);
+                    // List all available modal IDs
+                    const allModals = document.querySelectorAll('.modal');
+                    console.log('📋 Available modals:', Array.from(allModals).map(m => m.id));
+                }
+                
+                // Force a reflow
+                document.body.offsetHeight;
+                
+                console.log('🎯 Modal show process completed');
+                
+            } catch (error) {
+                console.error('❌ Error in showModal:', error);
             }
         }
 
@@ -756,12 +992,28 @@
         }
 
         function showProfile() {
-            updateSessionInfo();
-            showModal('profileModal');
+            console.log('🔍 showProfile function called');
+            try {
+                updateSessionInfo();
+                loadUserStats();
+                console.log('📊 About to show profile modal');
+                showModal('profileModal');
+                console.log('✅ Profile modal should be visible now');
+            } catch (error) {
+                console.error('❌ Error in showProfile:', error);
+            }
         }
 
         function showActivities() {
-            loadActivities();
+            console.log('🔍 showActivities function called');
+            try {
+                console.log('📊 About to show activities modal');
+                showModal('activitiesModal');
+                loadActivitiesModal();
+                console.log('✅ Activities modal should be visible now');
+            } catch (error) {
+                console.error('❌ Error in showActivities:', error);
+            }
         }
 
         function showSettings() {
@@ -993,6 +1245,207 @@
                 showAlert('Please enter valid coin counts for withdrawal', 'error');
             }
         });
+
+        // ===== ENHANCED PROFILE & ACTIVITIES FUNCTIONS =====
+        
+        // Profile Functions
+        function loadUserStats() {
+            // Set default values first
+            document.getElementById('userLoginCount').textContent = '0';
+            document.getElementById('userWithdrawals').textContent = '0';
+            document.getElementById('userActions').textContent = '0';
+            
+            fetch('/api/user/stats')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('userLoginCount').textContent = data.stats.loginCount || 0;
+                        document.getElementById('userWithdrawals').textContent = data.stats.withdrawalCount || 0;
+                        document.getElementById('userActions').textContent = data.stats.totalActions || 0;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading user stats:', error);
+                    // Keep default values of 0 on error
+                });
+        }
+        
+        function refreshProfile() {
+            updateSessionInfo();
+            loadUserStats();
+            showAlert('Profile refreshed successfully', 'success');
+        }
+        
+        // Activities Functions
+        function loadActivitiesModal() {
+            const container = document.getElementById('modalActivitiesList');
+            if (!container) {
+                console.error('modalActivitiesList container not found');
+                return;
+            }
+            
+            container.innerHTML = '<div class="loading-activities"><i class="fas fa-spinner fa-spin"></i><p>Loading activities...</p></div>';
+            
+            fetch('/api/activities?limit=50')
+                .then(response => response.json())
+                .then(activities => {
+                    displayActivitiesInModal(activities);
+                    updateActivityStats(activities);
+                })
+                .catch(error => {
+                    console.error('Error loading activities:', error);
+                    container.innerHTML = '<div class="error-activities"><i class="fas fa-exclamation-triangle"></i><p>Failed to load activities</p></div>';
+                });
+        }
+        
+        function displayActivitiesInModal(activities) {
+            const container = document.getElementById('modalActivitiesList');
+            
+            if (!activities || activities.length === 0) {
+                container.innerHTML = '<div class="no-activities"><i class="fas fa-history"></i><p>No activities found</p></div>';
+                return;
+            }
+            
+            container.innerHTML = activities.map(activity => `
+                <div class="activity-item-modal" data-action="${activity.action}">
+                    <div class="activity-icon-modal">
+                        <i class="fas fa-${getActivityIcon(activity.action)}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-main">
+                            <h5>${activity.username}</h5>
+                            <p>${formatActivityAction(activity.action)}</p>
+                        </div>
+                        <div class="activity-meta">
+                            <span class="activity-time">${formatActivityTime(activity.timestamp)}</span>
+                            <span class="activity-type">${activity.action.replace('_', ' ')}</span>
+                        </div>
+                    </div>
+                    <div class="activity-status">
+                        <span class="status-dot ${getActivityStatus(activity.action)}"></span>
+                    </div>
+                </div>
+            `).join('');
+            
+            setupActivityFilters();
+        }
+        
+        function updateActivityStats(activities) {
+            const stats = {
+                logins: activities.filter(a => a.action === 'login').length,
+                withdrawals: activities.filter(a => a.action === 'coin_withdrawal').length,
+                total: activities.length
+            };
+            
+            document.getElementById('totalLogins').textContent = stats.logins;
+            document.getElementById('totalWithdrawals').textContent = stats.withdrawals;
+            document.getElementById('totalActivities').textContent = stats.total;
+        }
+        
+        function setupActivityFilters() {
+            const filterSelect = document.getElementById('activityFilter');
+            const searchInput = document.getElementById('activitySearch');
+            
+            function filterActivities() {
+                const filterValue = filterSelect.value;
+                const searchValue = searchInput.value.toLowerCase();
+                const activities = document.querySelectorAll('.activity-item-modal');
+                
+                activities.forEach(activity => {
+                    const action = activity.dataset.action;
+                    const text = activity.textContent.toLowerCase();
+                    
+                    const matchesFilter = filterValue === 'all' || action === filterValue;
+                    const matchesSearch = searchValue === '' || text.includes(searchValue);
+                    
+                    activity.style.display = matchesFilter && matchesSearch ? 'flex' : 'none';
+                });
+            }
+            
+            filterSelect.addEventListener('change', filterActivities);
+            searchInput.addEventListener('input', filterActivities);
+        }
+        
+        function formatActivityAction(action) {
+            const actions = {
+                'login': 'Logged into the system',
+                'logout': 'Logged out from the system',
+                'coin_withdrawal': 'Withdrew coins from inventory',
+                'system_reset': 'Reset the system',
+                'fingerprint_enrollment': 'Enrolled fingerprint'
+            };
+            return actions[action] || action.replace('_', ' ');
+        }
+        
+        function formatActivityTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) return Math.floor(diff / 60000) + ' min ago';
+            if (diff < 86400000) return Math.floor(diff / 3600000) + ' hours ago';
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+        
+        function getActivityStatus(action) {
+            const statusMap = {
+                'login': 'success',
+                'logout': 'warning',
+                'coin_withdrawal': 'info',
+                'system_reset': 'danger',
+                'fingerprint_enrollment': 'success'
+            };
+            return statusMap[action] || 'default';
+        }
+        
+        function refreshActivities() {
+            loadActivitiesModal();
+            showAlert('Activities refreshed successfully', 'success');
+        }
+        
+        function exportActivities() {
+            fetch('/api/activities/export', { method: 'POST' })
+                .then(response => response.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `activities_${new Date().toISOString().split('T')[0]}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    showAlert('Activities exported successfully', 'success');
+                })
+                .catch(error => {
+                    console.error('Error exporting activities:', error);
+                    showAlert('Failed to export activities', 'error');
+                });
+        }
+        
+        function clearActivities() {
+            if (confirm('Are you sure you want to clear all activities? This action cannot be undone.')) {
+                fetch('/api/activities/clear', { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            loadActivitiesModal();
+                            showAlert('Activities cleared successfully', 'success');
+                        } else {
+                            showAlert('Failed to clear activities', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error clearing activities:', error);
+                        showAlert('Failed to clear activities', 'error');
+                    });
+            }
+        }
+        
+        function showActivityDetails() {
+            showAlert('Activity details feature coming soon!', 'info');
+        }
 
         // ===== ADVANCED FEATURES =====
         

@@ -4,29 +4,341 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/css/enhanced-style.css" />
-    <title>ProSorter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <title>ProSorter - Login</title>
 </head>
 <body class="login-body">
-    <div class="login-form-container">
-        <div class="logo-container">
-            <img src="/images/ProSorter.png" alt="logo" class="logo">
+    <!-- Animated Background Elements -->
+    <div class="login-background">
+        <div class="floating-coin coin-1">
+            <i class="fas fa-coins"></i>
         </div>
-        <span class="hello">Hello,</span>
-        <span class="welcome">Welcome!</span>
-        <% if (typeof error !== 'undefined') { %>
-            <div class="error"><%= error %></div>
-        <% } %>
-        <form id="form" method="POST" action="/login" class="form">
-            <input type="text" placeholder="Username" name="username">
-            <input type="password" placeholder="Password" name="password">
-            <div class="forgot-section">
-                <div class="checkBox">
-                    <input type="checkbox" name="rememberMe" id="rememberMe"> Remember Me 
-                </div>
-                <a href="#">Forgot Password?</a>
-            </div>
-            <input type="submit" value="Login" name="Login">
-        </form>
+        <div class="floating-coin coin-2">
+            <i class="fas fa-rupee-sign"></i>
+        </div>
+        <div class="floating-coin coin-3">
+            <i class="fas fa-circle"></i>
+        </div>
+        <div class="floating-coin coin-4">
+            <i class="fas fa-coins"></i>
+        </div>
     </div>
+
+    <div class="login-container">
+        <div class="login-form-container">
+            <!-- Enhanced Logo Section -->
+            <div class="logo-section">
+                <div class="logo-wrapper">
+                    <div class="logo-background">
+                        <i class="fas fa-cog fa-spin-slow"></i>
+                    </div>
+                    <div class="logo-main" id="logoContainer">
+                        <!-- Original ProSorter Image Logo -->
+                        <img src="/images/ProSorter.png" 
+                             alt="ProSorter Logo" 
+                             id="logoImage" 
+                             class="logo-image"
+                             style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%;" />
+                        
+                        <!-- Fallback if image fails to load -->
+                        <div class="logo-fallback" id="logoFallback" style="display: none;">
+                            <div class="logo-icon">
+                                <i class="fas fa-coins"></i>
+                            </div>
+                            <div class="logo-letters">PS</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="brand-info">
+                    <h1 class="brand-name">ProSorter</h1>
+                    <p class="brand-tagline">Smart Coin Management System</p>
+                </div>
+            </div>
+
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <span class="hello">Hello,</span>
+                <span class="welcome">Welcome Back!</span>
+                <p class="login-description">Please sign in to your account</p>
+            </div>
+
+            <!-- Error Message -->
+            <% if (typeof error !== 'undefined') { %>
+                <div class="error-container">
+                    <div class="error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <%= error %>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Enhanced Form -->
+            <form id="form" method="POST" action="/login" class="enhanced-form">
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <input type="text" placeholder="Enter your username" name="username" required>
+                </div>
+
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <input type="password" placeholder="Enter your password" name="password" required>
+                </div>
+
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" name="rememberMe" id="rememberMe">
+                        <label for="rememberMe">
+                            <span class="checkmark"></span>
+                            Remember Me
+                        </label>
+                    </div>
+                    <a href="#" class="forgot-link">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    <span class="btn-text">Sign In</span>
+                    <i class="fas fa-arrow-right btn-icon"></i>
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div class="login-footer">
+                <p>&copy; 2025 ProSorter. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#"><i class="fas fa-shield-alt"></i> Security</a>
+                    <a href="#"><i class="fas fa-headset"></i> Support</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced interactive effects with original image logo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Original image logo handling with fallback
+            const logoImage = document.getElementById('logoImage');
+            const logoFallback = document.getElementById('logoFallback');
+            const logoContainer = document.getElementById('logoContainer');
+            
+            if (logoImage) {
+                // Set up image loading handlers
+                logoImage.addEventListener('load', function() {
+                    console.log('✅ ProSorter logo image loaded successfully');
+                    this.style.display = 'block';
+                    if (logoFallback) {
+                        logoFallback.style.display = 'none';
+                    }
+                });
+                
+                logoImage.addEventListener('error', function() {
+                    console.log('❌ ProSorter logo image failed to load, showing fallback');
+                    this.style.display = 'none';
+                    if (logoFallback) {
+                        logoFallback.style.display = 'flex';
+                    }
+                });
+                
+                // Check if image already failed to load
+                if (logoImage.complete && logoImage.naturalHeight === 0) {
+                    console.log('Logo image failed to load (immediate check)');
+                    logoImage.style.display = 'none';
+                    if (logoFallback) {
+                        logoFallback.style.display = 'flex';
+                    }
+                }
+                
+                // Timeout fallback - if image doesn't load in 3 seconds
+                setTimeout(() => {
+                    if (logoImage.complete === false || logoImage.naturalHeight === 0) {
+                        console.log('Logo image loading timeout, showing fallback');
+                        logoImage.style.display = 'none';
+                        if (logoFallback) {
+                            logoFallback.style.display = 'flex';
+                        }
+                    }
+                }, 3000);
+            }
+
+            console.log('Logo container found:', !!logoContainer);
+
+            // Form validation feedback
+            const form = document.getElementById('form');
+            const inputs = form.querySelectorAll('input[type="text"], input[type="password"]');
+            
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (this.value === '') {
+                        this.parentElement.classList.remove('focused');
+                        this.parentElement.classList.remove('has-value');
+                    } else {
+                        this.parentElement.classList.add('has-value');
+                    }
+                });
+                
+                input.addEventListener('input', function() {
+                    if (this.value !== '') {
+                        this.parentElement.classList.add('has-value');
+                    } else {
+                        this.parentElement.classList.remove('has-value');
+                    }
+                });
+
+                // Add ripple effect on focus
+                input.addEventListener('focus', function() {
+                    const ripple = document.createElement('div');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        border-radius: 50%;
+                        background: rgba(102, 126, 234, 0.3);
+                        transform: scale(0);
+                        animation: ripple 0.6s linear;
+                        top: 50%;
+                        left: 50%;
+                        width: 20px;
+                        height: 20px;
+                        margin-left: -10px;
+                        margin-top: -10px;
+                        pointer-events: none;
+                    `;
+                    this.parentElement.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        if (ripple.parentNode) {
+                            ripple.remove();
+                        }
+                    }, 600);
+                });
+            });
+
+            // Enhanced floating coins animation with mouse interaction
+            const coins = document.querySelectorAll('.floating-coin');
+            coins.forEach((coin, index) => {
+                coin.style.animationDelay = (index * 0.7) + 's';
+                
+                // Add mouse interaction
+                coin.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.3) rotate(180deg)';
+                    this.style.opacity = '0.9';
+                });
+                
+                coin.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                    this.style.opacity = '';
+                });
+            });
+
+            // Enhanced button interaction
+            const loginBtn = document.querySelector('.login-btn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function(e) {
+                    // Don't prevent default - let form submit normally
+                    // Just add visual feedback
+                    const originalText = this.querySelector('.btn-text').textContent;
+                    const icon = this.querySelector('.btn-icon');
+                    
+                    this.querySelector('.btn-text').textContent = 'Signing In...';
+                    icon.className = 'fas fa-spinner fa-spin btn-icon';
+                    
+                    // Don't disable the button - let the form submit
+                    // The page will redirect or reload anyway
+                });
+            }
+
+            // Enhanced particles effect on logo hover
+            if (logoContainer) {
+                logoContainer.addEventListener('mouseenter', function() {
+                    createParticles(this);
+                });
+            }
+
+            function createParticles(element) {
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.style.cssText = `
+                            position: absolute;
+                            width: 8px;
+                            height: 8px;
+                            background: linear-gradient(45deg, #667eea, #f093fb);
+                            border-radius: 50%;
+                            pointer-events: none;
+                            z-index: 1000;
+                            box-shadow: 0 0 12px rgba(102, 126, 234, 0.6);
+                        `;
+                        
+                        const rect = element.getBoundingClientRect();
+                        particle.style.left = (rect.left + rect.width/2) + 'px';
+                        particle.style.top = (rect.top + rect.height/2) + 'px';
+                        
+                        document.body.appendChild(particle);
+                        
+                        const angle = (i * 36) * Math.PI / 180;
+                        const distance = 80 + Math.random() * 50;
+                        const endX = rect.left + rect.width/2 + Math.cos(angle) * distance;
+                        const endY = rect.top + rect.height/2 + Math.sin(angle) * distance;
+                        
+                        particle.animate([
+                            { 
+                                left: (rect.left + rect.width/2) + 'px', 
+                                top: (rect.top + rect.height/2) + 'px',
+                                opacity: 1,
+                                transform: 'scale(1) rotate(0deg)'
+                            },
+                            { 
+                                left: endX + 'px', 
+                                top: endY + 'px',
+                                opacity: 0,
+                                transform: 'scale(0.5) rotate(360deg)'
+                            }
+                        ], {
+                            duration: 1200,
+                            easing: 'ease-out'
+                        }).onfinish = () => particle.remove();
+                    }, i * 80);
+                }
+            }
+
+            // Add CSS for ripple animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Keyboard navigation enhancement
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
+                    const inputs = Array.from(form.querySelectorAll('input[type="text"], input[type="password"]'));
+                    const currentIndex = inputs.indexOf(document.activeElement);
+                    
+                    if (currentIndex < inputs.length - 1) {
+                        inputs[currentIndex + 1].focus();
+                    } else if (loginBtn) {
+                        loginBtn.click();
+                    }
+                }
+            });
+
+            // Center the form container
+            const formContainer = document.querySelector('.login-form-container');
+            if (formContainer) {
+                formContainer.style.margin = '0 auto';
+                formContainer.style.display = 'block';
+            }
+        });
+    </script>
 </body>
 </html>

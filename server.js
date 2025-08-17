@@ -22,7 +22,7 @@ const io = socketIo(server);
 
 // Firebase imports
 const { initializeApp } = require('firebase/app');
-const { getDatabase, ref, get, child, update, push, query, orderByChild, limitToLast } = require('firebase/database');
+const { getDatabase, ref, get, child, update, push, remove, query, orderByChild, limitToLast } = require('firebase/database');
 
 // Logger setup
 const logger = winston.createLogger({
@@ -90,7 +90,7 @@ app.use(session({
     }
 }));
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3002;
 
 // Firebase configuration using environment variables
 const firebaseConfig = {
@@ -198,13 +198,24 @@ app.post('/login',
     loginLimiter,
     async (req, res) => {
         try {
+            console.log('🔐 Login attempt:', req.body);
             const { username, password } = req.body;
+            
+            if (!username || !password) {
+                console.log('❌ Missing username or password');
+                return res.render('login', { error: 'Please enter both username and password' });
+            }
+            
+            console.log('📡 Checking user in database:', username);
             const userRef = ref(database, `users/${username}`);
             
             const userSnapshot = await get(userRef);
             const userData = userSnapshot.val();
             
+            console.log('👤 User data found:', !!userData);
+            
             if (userData && await bcrypt.compare(password, userData.password)) {
+                console.log('✅ Login successful for:', username);
                 req.session.user = {
                     username: username,
                     role: userData.role || 'user',
@@ -213,14 +224,17 @@ app.post('/login',
                 
                 await logActivity(username, 'login', { ip: req.ip });
                 
-                res.redirect('/dashboard');
+                console.log('🚀 Redirecting to dashboard');
+                return res.redirect('/dashboard');
             } else {
+                console.log('❌ Invalid credentials for:', username);
                 await logActivity(username || 'unknown', 'failed_login', { ip: req.ip });
-                res.render('login', { error: 'Invalid username or password' });
+                return res.render('login', { error: 'Invalid username or password' });
             }
         } catch (error) {
+            console.error('❌ Login error:', error);
             logger.error('Login error:', error);
-            res.render('login', { error: 'Login failed. Please try again.' });
+            return res.render('login', { error: 'Login failed. Please try again.' });
         }
     }
 );
@@ -497,6 +511,7 @@ app.get('/api/coins', isAuthenticated, async (req, res) => {
 
 app.get('/api/activities', isAuthenticated, async (req, res) => {
     try {
+        const { limit = 20, filter, search } = req.query;
         const activitiesRef = ref(database, 'activities');
         const activitiesSnapshot = await get(activitiesRef);
         const activities = [];
@@ -507,9 +522,25 @@ app.get('/api/activities', isAuthenticated, async (req, res) => {
                 allActivities.push({ id: child.key, ...child.val() });
             });
             
-            // Sort by timestamp and get last 20
+            // Sort by timestamp
             allActivities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            activities.push(...allActivities.slice(0, 20));
+            
+            // Apply filters
+            let filteredActivities = allActivities;
+            
+            if (filter && filter !== 'all') {
+                filteredActivities = filteredActivities.filter(activity => activity.action === filter);
+            }
+            
+            if (search) {
+                const searchLower = search.toLowerCase();
+                filteredActivities = filteredActivities.filter(activity => 
+                    activity.username.toLowerCase().includes(searchLower) ||
+                    activity.action.toLowerCase().includes(searchLower)
+                );
+            }
+            
+            activities.push(...filteredActivities.slice(0, parseInt(limit)));
         }
         
         res.json(activities);
@@ -842,6 +873,106 @@ app.get('/api/translations/:lang', async (req, res) => {
     }
 });
 
+// ===== USER STATS & ACTIVITIES API ENDPOINTS =====
+
+// Get user statistics
+app.get('/api/user/stats', isAuthenticated, async (req, res) => {
+    try {
+        const username = req.session.user.username;
+        const activitiesRef = ref(database, 'activities');
+        const activitiesSnapshot = await get(activitiesRef);
+        
+        let loginCount = 0;
+        let withdrawalCount = 0;
+        let totalActions = 0;
+        
+        if (activitiesSnapshot.exists()) {
+            activitiesSnapshot.forEach((child) => {
+                const activity = child.val();
+                if (activity.username === username) {
+                    totalActions++;
+                    if (activity.action === 'login') loginCount++;
+                    if (activity.action === 'coin_withdrawal') withdrawalCount++;
+                }
+            });
+        }
+        
+        res.json({
+            success: true,
+            stats: {
+                loginCount,
+                withdrawalCount,
+                totalActions
+            }
+        });
+    } catch (error) {
+        logger.error('Error fetching user stats:', error);
+        res.status(500).json({ success: false, error: 'Failed to fetch user statistics' });
+    }
+});
+
+// Export activities
+app.post('/api/activities/export', isAuthenticated, async (req, res) => {
+    try {
+        const activitiesRef = ref(database, 'activities');
+        const activitiesSnapshot = await get(activitiesRef);
+        
+        if (!activitiesSnapshot.exists()) {
+            return res.status(404).json({ error: 'No activities found' });
+        }
+        
+        const activities = [];
+        activitiesSnapshot.forEach((child) => {
+            activities.push(child.val());
+        });
+        
+        // Sort by timestamp
+        activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        
+        // Create CSV content
+        const headers = ['Username', 'Action', 'Timestamp', 'Details'];
+        const csvContent = [
+            headers.join(','),
+            ...activities.map(activity => [
+                activity.username,
+                activity.action,
+                activity.timestamp,
+                JSON.stringify(activity.details || {})
+            ].join(','))
+        ].join('\n');
+        
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename=activities_${moment().format('YYYY-MM-DD')}.csv`);
+        res.send(csvContent);
+        
+        logger.info(`Activities exported by ${req.session.user.username}`);
+    } catch (error) {
+        logger.error('Error exporting activities:', error);
+        res.status(500).json({ error: 'Failed to export activities' });
+    }
+});
+
+// Clear activities (admin only)
+app.delete('/api/activities/clear', isAuthenticated, async (req, res) => {
+    try {
+        // Check if user is admin
+        if (req.session.user.role !== 'admin') {
+            return res.status(403).json({ success: false, error: 'Admin access required' });
+        }
+        
+        const activitiesRef = ref(database, 'activities');
+        await remove(activitiesRef);
+        
+        await logActivity(req.session.user.username, 'activities_cleared', { ip: req.ip });
+        
+        res.json({ success: true, message: 'All activities cleared successfully' });
+        logger.info(`Activities cleared by ${req.session.user.username}`);
+    } catch (error) {
+        logger.error('Error clearing activities:', error);
+        res.status(500).json({ success: false, error: 'Failed to clear activities' });
+    }
+});
+
 // Socket.io connection handling
 io.on('connection', (socket) => {
     logger.info('User connected:', socket.id);
@@ -873,7 +1004,21 @@ cron.schedule('0 0 * * *', async () => {
 
 server.listen(port, () => {
     logger.info(`ProSorter server started at http://localhost:${port}`);
-    console.log(`🚀 ProSorter server running on port ${port}`);
+    console.log('\n🚀 ProSorter Server Started Successfully!');
+    console.log('========================================');
+    console.log(`🌐 URL: http://localhost:${port}`);
+    console.log('📱 Status: Ready for connections');
+    console.log('');
+    console.log('🔐 Login Credentials:');
+    console.log('   Username: admin');
+    console.log('   Password: admin123');
+    console.log('');
+    console.log('🎯 Quick Start:');
+    console.log('   1. Open browser to http://localhost:' + port);
+    console.log('   2. Enter admin/admin123');
+    console.log('   3. Click Sign In');
+    console.log('   4. Access dashboard');
+    console.log('========================================\n');
 });
 
 module.exports = app;

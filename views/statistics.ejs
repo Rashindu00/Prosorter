@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProSorter Statistics</title>
     <link rel="stylesheet" type="text/css" href="/css/enhanced-style.css" />
+    <link rel="stylesheet" type="text/css" href="/css/theme-system.css" />
+    <link rel="stylesheet" type="text/css" href="/css/settings-modal.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -38,6 +40,12 @@
                     <span>Activities</span>
                 </a>
             </li>
+            <li>
+                <a href="#" id="settingsBtn">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
             <li class="logout">
                 <form action="/logout" method="POST" style="margin: 0;">
                     <button type="submit" style="background: none; border: none; color: white; cursor: pointer; width: 100%; text-align: left; padding: 1rem; display: flex; align-items: center; gap: 1.5rem;">
@@ -54,11 +62,34 @@
             <div class="header--title">
                 <span>Analytics & Reports</span>
                 <h2>Statistics</h2>
+                <small class="text-muted">Comprehensive analytics and reporting dashboard</small>
             </div>
             <div class="user--info">
+                <!-- Theme Toggle -->
+                <div class="theme-controls">
+                    <button id="themeToggle" class="theme-toggle-btn" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+                
+                <!-- Language Selector -->
+                <div class="language-controls">
+                    <select id="languageSelector" class="language-selector">
+                        <option value="en">English</option>
+                        <option value="si">සිංහල</option>
+                    </select>
+                </div>
+                
+                <div class="notification-badge">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge" id="notificationCount">0</span>
+                </div>
                 <div class="user-avatar">
                     <i class="fas fa-user-circle"></i>
                     <span><%= user.username %></span>
+                </div>
+                <div class="status-indicator">
+                    <span id="connectionStatus" class="online">Online</span>
                 </div>
             </div>
         </div>
@@ -368,6 +399,126 @@
             a.click();
             document.body.removeChild(a);
         }
+
+        // Settings Modal Functions
+        function showSettings() {
+            loadCurrentSettings();
+            showModal('settingsModal');
+        }
+
+        function showModal(modalId) {
+            document.body.classList.add('modal-open');
+            document.getElementById('modalOverlay').style.display = 'block';
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal() {
+            document.body.classList.remove('modal-open');
+            document.getElementById('modalOverlay').style.display = 'none';
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+
+        function loadCurrentSettings() {
+            fetch('/api/settings')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const theme = data.settings.theme || 'light';
+                        const lightBtn = document.getElementById('lightThemeBtn');
+                        const darkBtn = document.getElementById('darkThemeBtn');
+                        
+                        if (lightBtn) lightBtn.classList.toggle('active', theme === 'light');
+                        if (darkBtn) darkBtn.classList.toggle('active', theme === 'dark');
+                        
+                        const langSelector = document.getElementById('settingsLanguageSelector');
+                        if (langSelector) langSelector.value = data.settings.language || 'en';
+                    }
+                })
+                .catch(error => console.error('Error loading settings:', error));
+        }
+
+        function changeTheme(theme) {
+            fetch('/api/settings/theme', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ theme })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.documentElement.setAttribute('data-theme', theme);
+                    updateThemeButtons(theme);
+                }
+            })
+            .catch(error => console.error('Error saving theme:', error));
+        }
+
+        function updateThemeButtons(theme) {
+            document.getElementById('lightThemeBtn').classList.toggle('active', theme === 'light');
+            document.getElementById('darkThemeBtn').classList.toggle('active', theme === 'dark');
+        }
+
+        // Setup event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const settingsBtn = document.getElementById('settingsBtn');
+            if (settingsBtn) settingsBtn.addEventListener('click', (e) => { e.preventDefault(); showSettings(); });
+
+            const modalOverlay = document.getElementById('modalOverlay');
+            if (modalOverlay) modalOverlay.addEventListener('click', closeModal);
+
+            const settingsCloseBtn = document.getElementById('settingsCloseBtn');
+            if (settingsCloseBtn) settingsCloseBtn.addEventListener('click', closeModal);
+
+            const lightThemeBtn = document.getElementById('lightThemeBtn');
+            const darkThemeBtn = document.getElementById('darkThemeBtn');
+            
+            if (lightThemeBtn) lightThemeBtn.addEventListener('click', () => changeTheme('light'));
+            if (darkThemeBtn) darkThemeBtn.addEventListener('click', () => changeTheme('dark'));
+        });
     </script>
+
+    <!-- Modal Templates -->
+    <div id="modalOverlay" class="modal-overlay"></div>
+    
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content settings-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> Settings</h3>
+                <button class="modal-close-btn" onclick="closeModal()" aria-label="Close Settings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Theme Settings -->
+            <div class="settings-section">
+                <h4><i class="fas fa-palette"></i> Appearance</h4>
+                <div class="setting-item">
+                    <label>Theme:</label>
+                    <div class="theme-options">
+                        <button id="lightThemeBtn" class="theme-btn">
+                            <i class="fas fa-sun"></i> Light
+                        </button>
+                        <button id="darkThemeBtn" class="theme-btn">
+                            <i class="fas fa-moon"></i> Dark
+                        </button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <label>Language:</label>
+                    <select id="settingsLanguageSelector">
+                        <option value="en">English</option>
+                        <option value="si">සිංහල</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="settingsCloseBtn" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

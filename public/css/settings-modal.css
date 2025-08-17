@@ -1,16 +1,68 @@
 /* Enhanced Settings Modal Styles */
 .settings-modal {
-    max-width: 500px !important;
-    width: 90% !important;
-    max-height: 85vh !important;
+    max-width: 600px !important;
+    width: 95% !important;
+    max-height: 90vh !important;
     overflow-y: auto !important;
     border-radius: 16px !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25) !important;
     border: none !important;
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
     position: relative !important;
     z-index: 10001 !important;
-   
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem 1rem 2rem;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 1.5rem;
+}
+
+.modal-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.modal-close-btn:hover {
+    background: #f1f5f9;
+    color: #ef4444;
+    transform: scale(1.1);
+}
+
+.settings-modal .settings-section {
+    margin: 0 2rem 1.25rem 2rem;
+}
+
+.settings-modal .modal-actions {
+    margin: 1.5rem 2rem 0 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #e2e8f0;
 }
 
 .settings-modal h3 {
