@@ -142,8 +142,8 @@ body {
 /* Language Selector */
 .language-selector {
     position: fixed;
-    top: 80px;
-    right: 20px;
+    top: 30px;
+    right: 40px;
     z-index: 1000;
     background: var(--bg-card);
     border: 2px solid var(--border-color);
@@ -170,7 +170,7 @@ body {
 
 /* Sidebar Enhancements */
 .sidebar {
-    width: 280px;
+    width: 150px;
     height: 100vh;
     background: var(--bg-sidebar);
     position: fixed;
@@ -186,6 +186,7 @@ body {
 }
 
 .sidebar .logo {
+    background-color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -246,11 +247,15 @@ body {
 
 /* Main Content Area */
 .main--content {
-    margin-left: 280px;
+    margin-left: 180px;
     min-height: 100vh;
     background: var(--bg-primary);
     transition: margin-left var(--transition-normal), background-color var(--transition-normal);
     padding: 2rem;
+}
+
+.sidebar:hover + .main--content {
+    margin-left: 300px;
 }
 
 .sidebar.collapsed + .main--content {

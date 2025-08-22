@@ -58,7 +58,6 @@ body.modal-open {
     bottom: 0;
     width: 110px;
     height: 100vh;
-    padding: 0 1.7rem;
     color: #fff;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -72,7 +71,6 @@ body.modal-open {
 }
 
 .logo {
-    height: 80px;
     padding: 16px;
     display: flex;
     align-items: center;
@@ -129,7 +127,7 @@ body.modal-open {
 
 .logout {
     position: absolute;
-    bottom: 0;
+    bottom: 30px;
     left: 0;
     width: 100%;
 }
